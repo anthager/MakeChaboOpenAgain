@@ -1,13 +1,12 @@
-# This is the service for the answer validation
+# Opens the door to Chabo
 
-The entry point is the validate function in src/validation-algo.js
+may work with other CSB doors as well. Right now its is hard coded for the A door since only losers live in B
 <br>
-Start the server by running `yarn run` and run test by running `yarn test`
+
+# To unlock the door:
+
+- place your credentials in a file `src/secrets.js` and export as `pw` and `log`
+- call `unlockDoor()` in src/index.js
+
 <br>
-Please write tests
-
-#### To get started:
-
-- Make sure you have node and yarn installed (npm will work as well but since the lockfile is for yarn please install yarn with `npm i -g yarn`)
-- Run `yarn`
-- Done
+Might be a good idea to use process.env instead of static js-file
