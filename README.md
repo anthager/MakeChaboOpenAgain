@@ -7,7 +7,11 @@ may work with other CSB doors as well. Right now its is hard coded for the A doo
 
 - place your credentials in a file `src/secrets.js` and export as `pw` and `log`
 - call `unlockDoor()` in src/index.js
-  <br>
-  Might be a good idea to use process.env instead of static js-file
-  <br>
-  `./server` is for testing what the http-calls look like, probably a good idea to use as similar http-headers as the original requests as possible. Aspus might know their shit
+
+<br>
+
+Might be a good idea to use process.env instead of static js-file
+
+<br>
+
+`./server` is for testing what the http-calls look like, probably a good idea to use as similar http-headers as the original requests as possible. Aspus might know their shit
