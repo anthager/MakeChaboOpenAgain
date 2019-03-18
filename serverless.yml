@@ -37,6 +37,7 @@ plugins:
   - serverless-offline #serverless-offline needs to be last in the list
 
 custom:
+  tableName: "door-opening-${self:provider.stage}"
   dynamodb:
     start:
       migrate: true
@@ -46,6 +47,8 @@ provider:
   runtime: nodejs8.10
   region: eu-north-1
   stage: dev
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -65,20 +68,28 @@ functions:
     handler: handler.unlock
     events:
       - http:
-          path: unlock
+          path: /
           method: get
 resources:
   Resources:
-    LastOpened:
+    DoorOpenings:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: lastOpened
+        TableName: ${self:custom.tableName}
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: success
             AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+          # - AttributeName: success
+          #   AttributeType: B
         KeySchema:
-          - AttributeName: id
+          - AttributeName: success
             KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+          # - AttributeName: success
+          #   KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

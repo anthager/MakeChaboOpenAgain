@@ -2,46 +2,46 @@
 // eslint-disable-next-line no-unused-vars
 const { unlockDoor } = require('./src')
 const aws = require('aws-sdk')
-// const { v4 } = require('uuid')
 
 // eslint-disable-next-line no-unused-vars
 const unlock = async (event, context) => {
   // const res = await unlockDoor()
   const dynamoDb = new aws.DynamoDB.DocumentClient()
-  // const dynamoDb = process.env.IS_OFFLINE
-  //   ? new aws.DynamoDB.DocumentClient({
-  //       region: 'localhost',
-  //       endpoint: 'http://localhost:8000',
-  //     })
-  //   : new aws.DynamoDB.DocumentClient()
-
+  const TableName = process.env.TABLE_NAME
+  const waitMS = 10000
   const res = await dynamoDb
-    .get({
-      TableName: 'lastOpened',
-      Key: {
-        id: 'latest',
+    .query({
+      TableName,
+      Limit: 1,
+      KeyConditionExpression: '#success = :success',
+      ScanIndexForward: false,
+      ExpressionAttributeNames: {
+        '#success': 'success',
+      },
+      ExpressionAttributeValues: {
+        ':success': 'true',
       },
     })
     .promise()
-  const timestamp = res && res.Item && res.Item.timestamp
+  const { timestamp } = res && res.Items[0]
+  const body =
+    !timestamp || +new Date() - timestamp > waitMS
+      ? {
+          success: 'true',
+        }
+      : {
+          success: 'false',
+          reason: 'recently opened',
+          wait: waitMS - (+new Date() - timestamp),
+        }
 
-  if (!timestamp || +new Date() - timestamp > 20000) {
-    console.log('updating with', +new Date())
-    await dynamoDb
-      .put({ TableName: 'lastOpened', Item: { timestamp: +new Date(), id: 'latest' } })
-      .promise()
-    return {
-      statusCode: 200,
-      body: JSON.stringify('nice'),
-    }
-  }
+  await dynamoDb
+    .put({ TableName, Item: { timestamp: +new Date(), success: body.success } })
+    .promise()
+
   return {
     statusCode: 200,
-    body: JSON.stringify({
-      success: false,
-      reason: 'recently opened',
-      wait: 20000 - (+new Date() - timestamp),
-    }),
+    body: JSON.stringify(body),
   }
 }
 
