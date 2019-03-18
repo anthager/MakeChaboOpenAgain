@@ -129,6 +129,6 @@ async function unlockDoor() {
   console.log('--------------------------')
   const unlockMsg = await _unlockDoor(aptusCookie)
   console.log(unlockMsg)
+  return 'door unlocked you sick hacker'
 }
-
 module.exports = { parseCookies, unlockDoor }

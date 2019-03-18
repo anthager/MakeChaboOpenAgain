@@ -1,0 +1,84 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: MakeChaboOpenAgain
+
+# custom:
+#   dynamodb:
+#     # If you only want to use DynamoDB Local in some stages, declare them here
+#     stages:
+#       - dev
+#     start:
+#       port: 8000
+#       inMemory: true
+#       heapInitial: 200m
+#       heapMax: 1g
+#       migrate: true
+#       seed: true
+#       convertEmptyValues: true
+#     # Uncomment only if you already have a DynamoDB running locally
+#     # noStart: true
+
+# plugins:
+#   - serverless-dynamodb-local
+
+plugins:
+  # - serverless-dynamodb-local
+  - serverless-offline #serverless-offline needs to be last in the list
+
+custom:
+  dynamodb:
+    start:
+      migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: eu-north-1
+  stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+      Resource: arn:aws:dynamodb:eu-north-1
+
+functions:
+  unlock:
+    handler: handler.unlock
+    events:
+      - http:
+          path: unlock
+          method: get
+resources:
+  Resources:
+    LastOpened:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: lastOpened
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
