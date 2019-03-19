@@ -81,15 +81,11 @@ resources:
             AttributeType: S
           - AttributeName: timestamp
             AttributeType: N
-          # - AttributeName: success
-          #   AttributeType: B
         KeySchema:
           - AttributeName: success
             KeyType: HASH
           - AttributeName: timestamp
             KeyType: RANGE
-          # - AttributeName: success
-          #   KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
