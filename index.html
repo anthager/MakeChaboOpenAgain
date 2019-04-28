@@ -26,20 +26,35 @@
         color: #222222;
         margin: 0;
       }
+      #button {
+        background-color: #4b76a3;
+        padding: 8vh 0;
+        width: 70vw;
+        border-radius: 20px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body data-gr-c-s-loaded="true">
     <div
       align="center"
       id="answer"
-      style="display: grid; justify-items: center; align-items: center; height: 80vh; width: 100vw;"
+      style="display: grid; justify-items: center; align-items: center; height: 100vh; width: 100vw;"
     >
       <h1 id="answer-title"></h1>
+      <div id="button" onclick="openDoor()">
+        Open
+      </div>
     </div>
     <script>
-      (async () => {
+      async function openDoor() {
         let complete = false;
         let triesBeforeGiveUp = 5;
+        const failMsg = `failed, please dont try again.<br/> <a href="mailto:tja@anton.pizza?subject=the door open shit is broken man&body=>:(" style="font-size:48px" >if you want, tell me it's broken</a>`;
+        const successMsg = `door opened, have a nice day mate :) <br/> <a href="mailto:tja@anton.pizza?subject=you good&body=<3" style="font-size:48px">If you want, tell me im good</a> `;
+        document.getElementById("button").remove();
+        document.getElementById("answer-title").innerHTML = "loading, chill..";
+        console.log("nice");
         while (!complete) {
           // retry on fail
           try {
@@ -47,11 +62,9 @@
               "https://openapi.anton.pizza/"
             )).json();
             console.log(success);
-            let msg = `failed, please dont try again.<br/> <a href="mailto:tja@anton.pizza?subject=the door open shit is broken man&body=>:(" style="font-size:48px" >if you want, tell me it's broken</a>`;
-            if (success) {
-              msg = `door opened, have a nice day mate :) <br/> <a href="mailto:tja@anton.pizza?subject=you good&body=<3" style="font-size:48px">If you want, tell me im good</a> `;
-            }
-            document.getElementById("answer-title").innerHTML = msg;
+            document.getElementById("answer-title").innerHTML = success
+              ? successMsg
+              : failMsg;
             complete = true;
           } catch (err) {
             console.log(err);
@@ -64,9 +77,12 @@
             });
           }
         }
-      })();
+      }
     </script>
     <!-- <script>
+			const { success } = await new Promise((res, rej) => {
+				setTimeout(() => res({ success: true }), 500);
+			});
       const mockRequest = 
       mockRequest.then(({ success }) => {});
     </script> -->
