@@ -1,6 +1,6 @@
 # Opens the door to Chabo
 
-may work with other CSB doors as well. Right now its is hard coded for the A door since only losers live in B
+May work with other CSB doors as well. Right now its is hard coded for the A door since only losers live in B
 <br>
 
 # To unlock the door:
