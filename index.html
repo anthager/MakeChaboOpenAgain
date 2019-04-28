@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-139135828-1"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-139135828-1");
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+    <title>Open.anton.pizza</title>
+    <meta name="theme-color" content="#ffffff" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif, Roboto,
+          Ubuntu, "Segoe UI";
+        text-align: center;
+        font-size: 64px;
+        color: #222222;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body data-gr-c-s-loaded="true">
+    <div
+      align="center"
+      id="answer"
+      style="display: grid; justify-items: center; align-items: center; height: 80vh; width: 100vw;"
+    >
+      <h1 id="answer-title"></h1>
+    </div>
+    <script>
+      (async () => {
+        let complete = false;
+        let triesBeforeGiveUp = 5;
+        while (!complete) {
+          // retry on fail
+          try {
+            const { success } = await (await fetch(
+              "https://openapi.anton.pizza/"
+            )).json();
+            console.log(success);
+            let msg = `failed, please dont try again.<br/> <a href="mailto:tja@anton.pizza?subject=the door open shit is broken man&body=>:(" style="font-size:48px" >if you want, tell me it's broken</a>`;
+            if (success) {
+              msg = `door opened, have a nice day mate :) <br/> <a href="mailto:tja@anton.pizza?subject=you good&body=<3" style="font-size:48px">If you want, tell me im good</a> `;
+            }
+            document.getElementById("answer-title").innerHTML = msg;
+            complete = true;
+          } catch (err) {
+            console.log(err);
+            console.log("failed");
+            if (--triesBeforeGiveUp === 0) {
+              complete = true;
+            }
+            await new Promise((res, rej) => {
+              setTimeout(() => res({ success: true }), 1500);
+            });
+          }
+        }
+      })();
+    </script>
+    <!-- <script>
+      const mockRequest = 
+      mockRequest.then(({ success }) => {});
+    </script> -->
+  </body>
+</html>
