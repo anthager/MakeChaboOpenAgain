@@ -110,7 +110,7 @@ function parseCookies(cookies) {
 function getUrlFromPayload(payload) {
   const reg = new RegExp(
     // eslint-disable-next-line prettier/prettier
-    'www.chalmersstudentbostader.se\/aptusportal\/Account\/RemoteLogin\\?module=Lock&.+?(?="}]},)',
+    'www.chalmersstudentbostader.se/aptusportal/Account/RemoteLogin\\?module=Lock&.+?(?="}]},)',
   )
   return reg.exec(payload).toString()
 }
@@ -121,14 +121,19 @@ function formatUrl(url) {
 }
 
 async function unlockDoor() {
-  const csbCookies = await getCsbCookies()
-  console.log('--------------------------')
-  const aptusUrl = await getUrlToAptus(csbCookies)
-  console.log('--------------------------')
-  const aptusCookie = await getAptusCookies(aptusUrl)
-  console.log('--------------------------')
-  const unlockMsg = await _unlockDoor(aptusCookie)
-  console.log(unlockMsg)
-  return 'door unlocked you sick hacker'
+  try {
+    const csbCookies = await getCsbCookies()
+    console.log('--------------------------')
+    const aptusUrl = await getUrlToAptus(csbCookies)
+    console.log('--------------------------')
+    const aptusCookie = await getAptusCookies(aptusUrl)
+    console.log('--------------------------')
+    const unlockMsg = await _unlockDoor(aptusCookie)
+    console.log(unlockMsg)
+    return { success: true }
+  } catch (err) {
+    console.log(err)
+    return { success: false }
+  }
 }
 module.exports = { parseCookies, unlockDoor }

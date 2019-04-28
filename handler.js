@@ -24,18 +24,25 @@ const unlock = async (event, context) => {
       },
     })
     .promise()
-  const { timestamp } = query && query.Items[0]
+  console.log(query)
+  console.log(query.Items[0])
+  const timestamp = query && query.Items[0] && query.Items[0].timestamp
   const success = !timestamp || +new Date() - timestamp > waitMS
   const response = success
     ? await unlockDoor()
-    : `wait for ${waitMS - (+new Date() - timestamp)} ms`
+    : { success: false, wait: `wait for ${waitMS - (+new Date() - timestamp)} ms` }
+  console.log('at dynamo')
   await dynamoDb
     .put({ TableName, Item: { timestamp: +new Date(), success: success + '' } })
     .promise()
 
   return {
     statusCode: 200,
-    body: response,
+    body: JSON.stringify(response),
+    headers: {
+      'Access-Control-Allow-Credentials': true,
+      'Access-Control-Allow-Origin': '*',
+    },
   }
 }
 
