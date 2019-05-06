@@ -13,9 +13,10 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: eu-north-1
-  stage: dev
+  stage: prod
   environment:
     TABLE_NAME: ${self:custom.tableName}
+    NODE_ENV: ${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -32,10 +33,17 @@ provider:
 
 functions:
   unlock:
-    handler: handler.unlock
+    handler: handlers/unlock.exec
     events:
       - http:
           path: /
+          method: get
+          cors: true
+  uses:
+    handler: handlers/uses.today
+    events:
+      - http:
+          path: /uses
           method: get
           cors: true
 resources:

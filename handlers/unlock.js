@@ -1,12 +1,12 @@
 'use strict'
 // eslint-disable-next-line no-unused-vars
-const { unlockDoor } = require('./src')
+const { unlockDoor } = require('../src')
 const aws = require('aws-sdk')
 // const { token } = require('./secrets/token')
 
 // const unlockDoor = async () => 'door unlocked, note that it just unlocks and dont open'
 // eslint-disable-next-line no-unused-vars
-const unlock = async (event, context) => {
+const exec = async (event, context) => {
   const dynamoDb = new aws.DynamoDB.DocumentClient()
   const TableName = process.env.TABLE_NAME
   const waitMS = 8000
@@ -46,4 +46,4 @@ const unlock = async (event, context) => {
   }
 }
 
-module.exports = { unlock }
+module.exports = { exec }
