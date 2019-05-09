@@ -13,7 +13,7 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: eu-north-1
-  stage: prod
+  stage: staging
   environment:
     TABLE_NAME: ${self:custom.tableName}
     NODE_ENV: ${self:provider.stage}
@@ -34,6 +34,7 @@ provider:
 functions:
   unlock:
     handler: handlers/unlock.exec
+    timeout: 20
     events:
       - http:
           path: /

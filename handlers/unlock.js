@@ -1,6 +1,6 @@
 'use strict'
 // eslint-disable-next-line no-unused-vars
-const { unlockDoor } = require('../src')
+const { unlockDoor } = process.env.NODE_ENV === 'prod' ? require('../src') : require('../src/mocks')
 const aws = require('aws-sdk')
 // const { token } = require('./secrets/token')
 
