@@ -1,0 +1,10 @@
+.App {
+	height: 100vh;
+	width: 100vw;
+	display: grid;
+}
+.center {
+	align-self: center;
+	justify-self: center;
+	font-size: 3vh;
+}
