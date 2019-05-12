@@ -16,14 +16,14 @@ function App() {
                 <span className="center">{res ? successMsg : failMsg}</span>
                 {res ? (
                   <a className="mail center" href="mailto:hej@anton.pizza?subject=you good&body=<3">
-                    If you want, tell me im good
+                    tell me im good
                   </a>
                 ) : (
                   <a
                     className="center"
                     href="mailto:hej@anton.pizza?subject=the door open shit is broken man&body=>:("
                   >
-                    if you want, tell me its broken{' '}
+                    tell me its broken
                   </a>
                 )}
               </div>
