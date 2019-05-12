@@ -20,8 +20,8 @@ function App() {
                   </a>
                 ) : (
                   <a
+                    className="center"
                     href="mailto:hej@anton.pizza?subject=the door open shit is broken man&body=>:("
-                    style="font-size:48px"
                   >
                     if you want, tell me its broken{' '}
                   </a>
