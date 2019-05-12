@@ -1,8 +1,11 @@
-/* eslint-disable react/prop-types */
 import { Component } from 'react'
-import { openDoor } from './utils'
+import { openDoor } from '../utils'
+import { PropTypes } from 'prop-types'
 
 export default class RequestHOC extends Component {
+  static propTypes = {
+    children: PropTypes.func.isRequired,
+  }
   state = {
     loading: false,
   }

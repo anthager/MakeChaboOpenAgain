@@ -1,9 +1,9 @@
 import React from 'react'
 import './App.css'
-import RequestHOC from './RequestHOC'
-import LandingPage from './Components/LandingPage'
+import RequestHOC from './HOC/Request'
+import LandingPage from './Components/OpenDoor'
 import Loader from './Components/Loader'
-import DoneScreen from './Components/DoneScreen'
+import DoneScreen from './Components/DoneView'
 
 function App() {
   return (
