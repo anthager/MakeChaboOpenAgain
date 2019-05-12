@@ -1,9 +1,9 @@
 import React from 'react'
 import './App.css'
 import RequestHOC from './RequestHOC'
-
-const failMsg = `failed, please dont try again.</a>`
-const successMsg = `door opened, have a nice day mate :)`
+import LandingPage from './Components/LandingPage'
+import Loader from './Components/Loader'
+import DoneScreen from './Components/DoneScreen'
 
 function App() {
   return (
@@ -11,31 +11,11 @@ function App() {
       <RequestHOC>
         {(openDoor, loading, res) => {
           if (res !== undefined) {
-            return (
-              <div className="center">
-                <span className="center">{res ? successMsg : failMsg}</span>
-                {res ? (
-                  <a className="mail center" href="mailto:hej@anton.pizza?subject=you good&body=<3">
-                    tell me im good
-                  </a>
-                ) : (
-                  <a
-                    className="center"
-                    href="mailto:hej@anton.pizza?subject=the door open shit is broken man&body=>:("
-                  >
-                    tell me its broken
-                  </a>
-                )}
-              </div>
-            )
+            return <DoneScreen res={res} />
           } else if (loading) {
-            return <span className="center">Loading...</span>
+            return <Loader />
           }
-          return (
-            <div className="cover-all clickable" onClick={openDoor}>
-              <span className="center">Press anywhere to unlock</span>
-            </div>
-          )
+          return <LandingPage openDoor={openDoor} />
         }}
       </RequestHOC>
     </div>

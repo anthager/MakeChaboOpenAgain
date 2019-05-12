@@ -11,6 +11,7 @@ export default class RequestHOC extends Component {
     const res = await openDoor()
     this.setState({ loading: false, res })
   }
+
   render() {
     const { loading, res } = this.state
     return this.props.children(this._openDoor, loading, res)
