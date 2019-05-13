@@ -13,9 +13,9 @@ function App() {
           if (res !== undefined) {
             return <DoneScreen res={res} />
           } else if (loading) {
-            return <Loader />
+            return <LandingPage openDoor={openDoor} />
           }
-          return <LandingPage openDoor={openDoor} />
+          return <Loader />
         }}
       </RequestHOC>
     </div>
