@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build-frontend:
+    docker:
+      - image: circleci/node:10.15
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - frontend-dep-{{ checksum "frontend/package.json" }}
+            - frontend-dep-
+      - run: yarn --cwd frontend install
+      - save_cache:
+          paths:
+            - frontend/node_modules
+          key: frontend-dep-{{ checksum "frontend/package.json" }}
+      - run: yarn --cwd frontend run build
+      - run: |
+            scp -r -oStrictHostKeyChecking=no frontend/build "ci@open.anton.pizza:/home/ci"
+
+      
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build-frontend
