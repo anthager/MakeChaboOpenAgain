@@ -17,7 +17,7 @@ jobs:
           key: frontend-dep-{{ checksum "frontend/package.json" }}
       - run: yarn --cwd frontend run build
       - run: |
-            scp -r -oStrictHostKeyChecking=no frontend/build "ci@open.anton.pizza:/home/ci"
+            scp -r -oStrictHostKeyChecking=no frontend/build "ci@open.anton.pizza:/open.anton.pizza/"
 
       
 
