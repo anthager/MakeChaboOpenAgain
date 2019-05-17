@@ -1,8 +1,9 @@
-version: 2
+version: 2.1
+
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:10.15
+        - image: circleci/node:10.15
     working_directory: ~/repo
     steps:
       - checkout
@@ -16,8 +17,6 @@ jobs:
             - frontend/node_modules
           key: frontend-dep-{{ checksum "frontend/package.json" }}
       - run: yarn --cwd frontend run build
-      - run: mv frontend/build frontend/${CIRCLE_BRANCH}-build
-      - run: scp -r -oStrictHostKeyChecking=no frontend/${CIRCLE_BRANCH}-build "ci@open.anton.pizza:/open.anton.pizza/"
       - run: 
           name: update conf
           command: |
@@ -26,8 +25,10 @@ jobs:
             else 
               export CONF_NAME=nginx-conf/staging-open.anton.pizza.conf
             fi
-      - run: scp -r -oStrictHostKeyChecking=no $CONF_NAME "ci@open.anton.pizza:/open.anton.pizza/nginx-conf"
-      - run: ssh -t "ci@open.anton.pizza:/open.anton.pizza/" ls
+            mv frontend/build frontend/${CONF_NAME}-build
+            scp -r -oStrictHostKeyChecking=no frontend/${CONF_NAME}-build "ci@open.anton.pizza:/open.anton.pizza/builds"
+            scp ${CONF_NAME} "ci@open.anton.pizza:/open.anton.pizza/nginx-conf"
+      - run: ssh -t "ci@open.anton.pizza" ls
       
 
 workflows:
