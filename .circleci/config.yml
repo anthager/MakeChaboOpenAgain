@@ -16,13 +16,26 @@ jobs:
             - frontend/node_modules
           key: frontend-dep-{{ checksum "frontend/package.json" }}
       - run: yarn --cwd frontend run build
-      - run: |
-            scp -r -oStrictHostKeyChecking=no frontend/build "ci@open.anton.pizza:/open.anton.pizza/"
-
+      - run: mv frontend/build frontend/${CIRCLE_BRANCH}-build
+      - run: scp -r -oStrictHostKeyChecking=no frontend/${CIRCLE_BRANCH}-build "ci@open.anton.pizza:/open.anton.pizza/"
+      - run: 
+          name: update conf
+          command: |
+            if [ $CIRCLE_BRANCH == "master" ]; then
+              export CONF_NAME=nginx-conf/prod-open.anton.pizza.conf
+            else 
+              export CONF_NAME=nginx-conf/staging-open.anton.pizza.conf
+            fi
+      - run: scp -r -oStrictHostKeyChecking=no $CONF_NAME "ci@open.anton.pizza:/open.anton.pizza/nginx-conf"
+      - run: ssh -t "ci@open.anton.pizza:/open.anton.pizza/" ls
       
 
 workflows:
   version: 2
   build-deploy:
     jobs:
-      - build-frontend
+      - build-frontend:
+          filters:
+            branches:
+              only:
+                - staging
