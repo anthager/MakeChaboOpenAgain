@@ -21,13 +21,13 @@ jobs:
           name: update conf
           command: |
             if [ $CIRCLE_BRANCH == "master" ]; then
-              export CONF_NAME=nginx-conf/prod-open.anton.pizza.conf
-            else 
-              export CONF_NAME=nginx-conf/staging-open.anton.pizza.conf
+              export CONF_NAME=prod
+            elif [ $CIRCLE_BRANCH == "staging" ]; then
+              export CONF_NAME=staging
             fi
             mv frontend/build frontend/${CONF_NAME}-build
             scp -r -oStrictHostKeyChecking=no frontend/${CONF_NAME}-build "ci@open.anton.pizza:/open.anton.pizza/builds"
-            scp ${CONF_NAME} "ci@open.anton.pizza:/open.anton.pizza/nginx-conf"
+            scp nginx-conf/${CONF_NAME}-open.anton.pizza.conf "ci@open.anton.pizza:/open.anton.pizza/nginx-conf"
       - run: ssh -t "ci@open.anton.pizza" ls
       
 
@@ -39,4 +39,4 @@ workflows:
           filters:
             branches:
               only:
-                - staging
+                - staging 
