@@ -2,7 +2,7 @@ let isRunning = false
 export async function openDoor() {
   let complete = false
   let triesBeforeGiveUp = 5
-  // ensure the call isn't done twice
+  // ensure the call isn't done more than once
   if (isRunning) {
     return
   }
@@ -14,8 +14,7 @@ export async function openDoor() {
         ? 'https://stagingopenapi.anton.pizza/'
         : 'https://openapi.anton.pizza/'
     try {
-      const { success } = await (await fetch(url)).json()
-      return success
+      return await (await fetch(url)).json()
     } catch (err) {
       if (--triesBeforeGiveUp === 0) {
         return false
