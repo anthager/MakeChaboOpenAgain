@@ -32,12 +32,12 @@ provider:
       Resource: arn:aws:dynamodb:eu-north-1
 
 functions:
-  unlock:
-    handler: src/unlock/handler.exec
+  unlock-door:
+    handler: src/unlock-door/handler.exec
     timeout: 20
     events:
       - http:
-          path: /
+          path: /unlock-door
           method: get
           cors: true
   openings:

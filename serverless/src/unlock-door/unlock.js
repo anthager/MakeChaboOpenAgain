@@ -1,5 +1,5 @@
 const fetch = require('node-fetch')
-const { pw, log } = require('./secrets')
+const { pwd, log } = require('./secrets')
 
 async function getCsbCookies() {
   let cookies
@@ -14,7 +14,7 @@ async function getCsbCookies() {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     redirect: 'manual',
-    body: `log=${log}&pwd=${pw}&redirect_to=https%3A%2F%2Fwww.chalmersstudentbostader.se%2Fmin-bostad%2F`,
+    body: `log=${log}&pwd=${pwd}&redirect_to=https%3A%2F%2Fwww.chalmersstudentbostader.se%2Fmin-bostad%2F`,
     method: 'POST',
   })
   res.headers.forEach((a, b) => {

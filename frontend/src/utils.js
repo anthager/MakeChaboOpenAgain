@@ -11,8 +11,8 @@ export async function openDoor() {
     // retry on fail
     const url =
       process.env.NODE_ENV === 'development'
-        ? 'https://stagingopenapi.anton.pizza/'
-        : 'https://openapi.anton.pizza/'
+        ? 'https://stagingopenapi.anton.pizza/unlock-door'
+        : 'https://openapi.anton.pizza/unlock-door'
     try {
       return await (await fetch(url)).json()
     } catch (err) {
