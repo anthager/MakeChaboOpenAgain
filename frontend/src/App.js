@@ -7,7 +7,7 @@ import ResultView from './Components/ResultView'
 
 function App() {
   return (
-    <div className="App">
+    <div className="cover-all">
       <RequestHOC>
         {(openDoor, loading, res) => {
           if (res !== undefined) {
