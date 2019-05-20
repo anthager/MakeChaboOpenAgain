@@ -16,6 +16,6 @@ describe('time', () => {
     } catch (err) {
       var e = err
     }
-    expect(e).toEqual(new Error('invalid dates'))
+    expect(e).toBeDefined()
   })
 })
