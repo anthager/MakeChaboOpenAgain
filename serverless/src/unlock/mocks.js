@@ -10,12 +10,12 @@ const mockUrl =
 const mockAptusCookies =
   'ASP.NET_SessionId=1dxuv3ne3epk4b04ee4hi5bq; path=/; HttpOnly, .ASPXAUTH=2D3EE8712E8B377395AF7FE09DA34EEF2F89A1D0ED1EC039CCA27FD749CE3A48047665D209838CA499D535D1138F25FDB9A6FF92CA40F3A28614C706B87EF5D1AC9F03EA1CA1A0BDDCB2B969370528219A8A8C5250DEEA2762886F4451A0F531; path=/; HttpOnly'
 
-const unlockDoor = () =>
+const unlockDoor = (delay = 2500) =>
   new Promise(res => {
     setTimeout(() => {
       console.log('mock unlock call')
       res({ success: true })
       return
-    }, 5000)
+    }, delay)
   })
 module.exports = { mockUrlPayload, mockCookies, mockUrl, mockAptusCookies, unlockDoor }
