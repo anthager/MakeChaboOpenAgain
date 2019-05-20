@@ -6,14 +6,14 @@ const { initQuery, aggregate } = require('./queryHandling')
 // eslint-disable-next-line no-unused-vars
 const exec = async (event, context) => {
   try {
-    const { startDate, endDate } = getDates(event.queryStringParameters)
+    const { startDate, endDate } = getDates(event.queryStringParameters || {})
     const query = initQuery()
     const successful = aggregate(await query(true, startDate, endDate))
     const failed = aggregate(await query(false, startDate, endDate))
     return successfulRequest(successful, failed)
   } catch (err) {
     logger(err, 'error')
-    switch (err) {
+    switch (err.message) {
       case 'invalid dates': {
         return unsuccessfulRequest('invalid dates')
       }
