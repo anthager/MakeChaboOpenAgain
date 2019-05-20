@@ -1,16 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const failMsg = `failed, please dont try again.</a>`
-const successMsg = `door opened, have a nice day mate :)`
-
 const DoneScreen = props => {
   const { res } = props
   const { success, wait } = res
   if (success) {
     return (
       <div className="center">
-        <span className="center">{successMsg}</span>
+        <span className="center">door opened, have a nice day mate :)</span>
         <a className="mail center" href="mailto:hej@anton.pizza?subject=you good&body=<3">
           tell me im good
         </a>
@@ -25,7 +22,7 @@ const DoneScreen = props => {
   } else {
     return (
       <div className="center">
-        <span className="center">{failMsg}</span>
+        <span className="center">failed, please dont try again.</span>
         <a
           className="center"
           href="mailto:hej@anton.pizza?subject=the door open shit is broken man&body=>:("
