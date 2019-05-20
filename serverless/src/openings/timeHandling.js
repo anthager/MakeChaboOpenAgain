@@ -9,8 +9,8 @@ const getUTCFromCEST = (date, end = false) => {
 // will throw exception if it is unsuccessful
 const getDates = query => {
   try {
-    const startDate = query.startDate ? getUTCFromCEST(query.startDate) : new Date(0)
-    const endDate = query.endDate ? getUTCFromCEST(query.endDate, true) : new Date(0)
+    const startDate = query.startDate ? getUTCFromCEST(query.startDate) : +new Date(0)
+    const endDate = query.endDate ? getUTCFromCEST(query.endDate, true) : +new Date() - 1
     return { startDate, endDate }
   } catch (err) {
     // console.error(err)
