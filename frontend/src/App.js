@@ -1,9 +1,9 @@
 import React from 'react'
 import './App.css'
 import RequestHOC from './HOC/Request'
-import LandingPage from './Components/OpenDoor'
-import Loader from './Components/Loader'
-import DoneView from './Components/DoneView'
+import OpenDoorView from './Components/OpenDoorView'
+import LoaderView from './Components/LoaderView'
+import ResultView from './Components/ResultView'
 
 function App() {
   return (
@@ -11,11 +11,11 @@ function App() {
       <RequestHOC>
         {(openDoor, loading, res) => {
           if (res !== undefined) {
-            return <DoneView res={res} />
+            return <ResultView res={res} />
           } else if (loading) {
-            return <Loader />
+            return <LoaderView />
           }
-          return <LandingPage openDoor={openDoor} />
+          return <OpenDoorView openDoor={openDoor} />
         }}
       </RequestHOC>
     </div>
