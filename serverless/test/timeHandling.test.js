@@ -18,4 +18,18 @@ describe('time', () => {
     }
     expect(e).toBeDefined()
   })
+  it('should return 0 and current time when nothing is input', () => {
+    const input = {}
+    try {
+      var dates = getDates(input)
+    } catch (err) {
+      var e = err
+    }
+    expect(e).toBeUndefined()
+    expect(dates).toBeDefined()
+    const endDate = +new Date() - 1
+    expect(dates).toHaveProperty('startDate', 0)
+    expect(dates).toHaveProperty('endDate')
+    expect(dates.endDate).toBeLessThanOrEqual(endDate)
+  })
 })
