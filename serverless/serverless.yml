@@ -33,18 +33,18 @@ provider:
 
 functions:
   unlock:
-    handler: handlers/unlock.exec
+    handler: src/unlock/handler.exec
     timeout: 20
     events:
       - http:
           path: /
           method: get
           cors: true
-  uses:
-    handler: handlers/uses.today
+  openings:
+    handler: src/openings/handler.exec
     events:
       - http:
-          path: /uses
+          path: /openings
           method: get
           cors: true
 resources:
