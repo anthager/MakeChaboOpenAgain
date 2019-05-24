@@ -17,18 +17,22 @@ jobs:
             - frontend/node_modules
           key: frontend-dep-{{ checksum "frontend/package.json" }}
       - run: yarn --cwd frontend run build
+      - persist_to_workspace:
+          root: frontend
+          paths:
+            - build
+
+  deploy-frontend:
+    docker:
+        - image: circleci/node:10.15
+    steps:
+      - attach_workspace:
+          at: build
       - run: 
-          name: update conf
+          name: update build
           command: |
-            if [ $CIRCLE_BRANCH == "master" ]; then
-              export CONF_NAME=prod
-            elif [ $CIRCLE_BRANCH == "staging" ]; then
-              export CONF_NAME=staging
-            fi
-            mv frontend/build frontend/${CONF_NAME}-build
-            scp -r -oStrictHostKeyChecking=no frontend/${CONF_NAME}-build "ci@open.anton.pizza:/open.anton.pizza/builds"
-            scp nginx-conf/${CONF_NAME}-open.anton.pizza.conf "ci@open.anton.pizza:/open.anton.pizza/nginx-conf"
-      - run: ssh -t "ci@open.anton.pizza" ls
+            mv build ${CIRCLE_BRANCH}-build
+            scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "ci@open.anton.pizza:/open.anton.pizza/builds"
       
 
 workflows:
@@ -37,7 +41,10 @@ workflows:
     jobs:
       - build-frontend:
           filters:
+            tags:
+              only: /^v.*/
             branches:
-              only:
-                - staging 
-                - master
+              ignore: /.*/
+      - deploy-frontend:
+          requires:
+            - build-frontend
