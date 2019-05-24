@@ -19,4 +19,4 @@ The frontend application is written in React and can be found in frontend/
 Right now the frontend is hosted at a server with nginx and the config can be found in nginx-conf/
 
 # Api
-The api takes a query string parameter doorID which now can only be 116402 for the A door and 116400 for the B door. Default is the A door
+The api takes a query string parameter `doorID` which now can only be `116402` for the A door and `116400` for the B door. Default is the A door
