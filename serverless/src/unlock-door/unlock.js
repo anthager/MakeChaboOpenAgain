@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
 const { pwd, log } = require('./secrets')
+const { logger } = require('../shared/utils')
 
 async function getCsbCookies() {
   let cookies
@@ -20,10 +21,9 @@ async function getCsbCookies() {
   res.headers.forEach((a, b) => {
     if (b === 'set-cookie') {
       cookies = a
-      // console.log(a)
     }
   })
-  console.log('fetched csbCookies successfully...')
+  logger('fetched csbCookies successfully...')
   const parsed = parseCookies(cookies)
   return parsed
 }
@@ -49,7 +49,7 @@ async function getUrlToAptus(cookies) {
       method: 'GET',
     },
   )).text()
-  console.log('fetched aptusUrl successfully...')
+  logger('fetched aptusUrl successfully...')
   return formatUrl(getUrlFromPayload(body))
 }
 
@@ -71,7 +71,7 @@ async function getAptusCookies(url) {
       cookies = value
     }
   })
-  console.log('fetched aptusCookies successfully...')
+  logger('fetched aptusCookies successfully...')
   return parseCookies(cookies)
 }
 
@@ -123,16 +123,16 @@ function formatUrl(url) {
 async function unlockDoor(doorID) {
   try {
     const csbCookies = await getCsbCookies()
-    console.log('--------------------------')
+    logger('--------------------------')
     const aptusUrl = await getUrlToAptus(csbCookies)
-    console.log('--------------------------')
+    logger('--------------------------')
     const aptusCookie = await getAptusCookies(aptusUrl)
-    console.log('--------------------------')
+    logger('--------------------------')
     const unlockMsg = await _unlockDoor(aptusCookie, doorID)
-    console.log(unlockMsg)
+    logger(unlockMsg)
     return { success: true }
   } catch (err) {
-    console.log(err)
+    logger(err)
     return { success: false }
   }
 }
