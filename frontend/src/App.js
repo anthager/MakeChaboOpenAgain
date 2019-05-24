@@ -3,7 +3,7 @@ import './App.css'
 import RequestHOC from './HOC/Request'
 import OpenDoorView from './Components/OpenDoorView'
 import LoaderView from './Components/LoaderView'
-import ResultView from './Components/ResultView'
+import OliviaResultView from './Components/OliviaResultView'
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <RequestHOC>
         {(openDoor, loading, res) => {
           if (res !== undefined) {
-            return <ResultView res={res} />
+            return <OliviaResultView res={res} />
           } else if (loading) {
             return <LoaderView />
           }

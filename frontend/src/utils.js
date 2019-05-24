@@ -9,10 +9,10 @@ export async function openDoor() {
   isRunning = true
   while (!complete) {
     // retry on fail
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? 'https://stagingopenapi.anton.pizza/unlock-door'
-        : 'https://openapi.anton.pizza/unlock-door'
+    const url = 'https://stagingopenapi.anton.pizza/unlock-door'
+    //process.env.NODE_ENV === 'development'
+    //? 'https://stagingopenapi.anton.pizza/unlock-door'
+    //: 'https://openapi.anton.pizza/unlock-door'
     try {
       return await (await fetch(url)).json()
     } catch (err) {

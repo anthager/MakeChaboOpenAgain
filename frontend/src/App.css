@@ -15,7 +15,10 @@
 .mail {
   display: block;
 }
-img {
+.loader {
   width: 100%;
   height: auto;
+}
+.olivia {
+  max-height: 50vh;
 }
