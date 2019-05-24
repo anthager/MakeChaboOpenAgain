@@ -75,9 +75,9 @@ async function getAptusCookies(url) {
   return parseCookies(cookies)
 }
 
-async function _unlockDoor(cookie) {
+async function _unlockDoor(cookie, doorID) {
   return (await fetch(
-    'https://apt-www.chalmersstudentbostader.se/AptusPortal/Lock/UnlockEntryDoor/116402',
+    `https://apt-www.chalmersstudentbostader.se/AptusPortal/Lock/UnlockEntryDoor/${doorID}`,
     {
       credentials: 'include',
       headers: {
@@ -120,7 +120,7 @@ function formatUrl(url) {
   return `https://apt-${arr[0]}%20${arr[1]}`
 }
 
-async function unlockDoor() {
+async function unlockDoor(doorID) {
   try {
     const csbCookies = await getCsbCookies()
     console.log('--------------------------')
@@ -128,7 +128,7 @@ async function unlockDoor() {
     console.log('--------------------------')
     const aptusCookie = await getAptusCookies(aptusUrl)
     console.log('--------------------------')
-    const unlockMsg = await _unlockDoor(aptusCookie)
+    const unlockMsg = await _unlockDoor(aptusCookie, doorID)
     console.log(unlockMsg)
     return { success: true }
   } catch (err) {
