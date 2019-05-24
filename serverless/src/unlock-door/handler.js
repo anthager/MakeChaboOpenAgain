@@ -9,6 +9,19 @@ const aws = require('aws-sdk')
 const exec = async (event, context) => {
   const dynamoDb = new aws.DynamoDB.DocumentClient()
   const TableName = process.env.TABLE_NAME
+  const doorID = (event.queryStringParameters && event.queryStringParameters.doorID) || {
+    doorID: 116402,
+  }
+  if (doorID !== 116402 && doorID !== 116400) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: true, msg: 'badID' }),
+      headers: {
+        'Access-Control-Allow-Credentials': true,
+        'Access-Control-Allow-Origin': '*',
+      },
+    }
+  }
   const waitMS = 10000
   const query = await dynamoDb
     .query({
@@ -27,7 +40,7 @@ const exec = async (event, context) => {
   const timestamp = query && query.Items[0] && query.Items[0].timestamp
   const success = !timestamp || +new Date() - timestamp > waitMS
   const response = success
-    ? await unlockDoor()
+    ? await unlockDoor(doorID)
     : { success: false, wait: waitMS - (+new Date() - timestamp) }
   await dynamoDb
     .put({ TableName, Item: { timestamp: +new Date(), success: success + '' } })
