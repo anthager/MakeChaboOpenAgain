@@ -1,6 +1,7 @@
 'use strict'
 // eslint-disable-next-line no-unused-vars
 const { unlockDoor } = process.env.NODE_ENV === 'prod' ? require('./unlock') : require('./mocks')
+const { logger } = require('../shared/utils')
 const aws = require('aws-sdk')
 // const { token } = require('./secrets/token')
 
@@ -9,10 +10,9 @@ const aws = require('aws-sdk')
 const exec = async (event, context) => {
   const dynamoDb = new aws.DynamoDB.DocumentClient()
   const TableName = process.env.TABLE_NAME
-  const doorID = (event.queryStringParameters && event.queryStringParameters.doorID) || {
-    doorID: 116402,
-  }
-  if (doorID !== 116402 && doorID !== 116400) {
+  const doorID = (event.queryStringParameters && event.queryStringParameters.doorID) || '116402'
+
+  if (doorID !== '116402' && doorID !== '116400') {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: true, msg: 'badID' }),
@@ -45,6 +45,7 @@ const exec = async (event, context) => {
   await dynamoDb
     .put({ TableName, Item: { timestamp: +new Date(), success: success + '' } })
     .promise()
+  logger(`opening the door with id ${doorID}`)
 
   return {
     statusCode: 200,
