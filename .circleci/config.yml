@@ -53,7 +53,7 @@ workflows:
           filters:
             branches:
               only: staging
-      - deploy-frontend-staging:
+      - deploy-frontend:
           requires:
             - build-frontend
   
@@ -65,7 +65,7 @@ workflows:
               only: /^v.*/
             branches:
               only: master
-      - deploy-frontend-staging:
+      - deploy-frontend:
           requires:
             - build-frontend
 
