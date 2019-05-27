@@ -13,7 +13,7 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: eu-north-1
-  stage: staging
+  stage: ${env:STAGE}
   environment:
     TABLE_NAME: ${self:custom.tableName}
     NODE_ENV: ${self:provider.stage}

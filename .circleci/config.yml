@@ -28,23 +28,45 @@ jobs:
     steps:
       - attach_workspace:
           at: build
-      - run: 
-          name: update build
-          command: |
-            mv build ${CIRCLE_BRANCH}-build
-            scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "ci@open.anton.pizza:/open.anton.pizza/builds"
+      - run: mv build ${CIRCLE_BRANCH}-build
+      - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "ci@open.anton.pizza:/open.anton.pizza/builds"
+
+  deploy-backend:
+    docker:
+        - image: circleci/node:10.15
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - serverless-dep-{{ checksum "serverless/package.json" }}
+            - serverless-dep-
+      - run: yarn add -g serverless
+      - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "ci@open.anton.pizza:/open.anton.pizza/builds"
       
 
 workflows:
   version: 2
-  build-deploy:
+
+  build-deploy-staging:
+    jobs:
+      - build-frontend:
+          filters:
+            branches:
+              only: staging
+      - deploy-frontend-staging:
+          requires:
+            - build-frontend
+  
+  build-deploy-prod:
     jobs:
       - build-frontend:
           filters:
             tags:
               only: /^v.*/
             branches:
-              ignore: /.*/
-      - deploy-frontend:
+              only: master
+      - deploy-frontend-staging:
           requires:
             - build-frontend
+
+  
