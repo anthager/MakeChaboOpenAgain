@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const DoneScreen = props => {
+const ResultView = props => {
   const { res } = props
   const { success, wait } = res
   if (success) {
@@ -34,8 +34,8 @@ const DoneScreen = props => {
   }
 }
 
-DoneScreen.propTypes = {
+ResultView.propTypes = {
   res: PropTypes.object.isRequired,
 }
 
-export default DoneScreen
+export default ResultView
