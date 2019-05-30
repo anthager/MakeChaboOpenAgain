@@ -64,7 +64,7 @@ workflows:
             tags:
               only: /^v.*/
             branches:
-              only: master
+              ignore: /.*/
       - deploy-frontend:
           requires:
             - build-frontend
