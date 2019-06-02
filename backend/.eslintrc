@@ -1,0 +1,31 @@
+{
+  "env": {
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": ["eslint:recommended", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
+  },
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "printWidth": 100,
+        "tabWidth": 2,
+        "semi": false,
+        "bracketSpacing": true,
+        "jsxBracketSameLine": false,
+        "singleQuote": true,
+        "trailingComma": "all",
+        "arrowParens": "avoid"
+      }
+    ],
+    "no-console": 0
+  }
+}
