@@ -4,10 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "test": "jest --watch"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
     "morgan": "^1.9.1"
   },
