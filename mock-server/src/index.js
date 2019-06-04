@@ -54,7 +54,7 @@ app.post('/wp-login.php', (req, res) => {
  * get aptus url
  */
 app.get('/widgets', (req, res) => {
-  const correct = {
+  const correctCookies = {
     PHPSESSID: 'mahodvd5ct6ccb8s1foghfjkd6',
     __utmc: '77924038',
     wordpress_test_cookie: 'WP+Cookie+check',
@@ -67,27 +67,74 @@ app.get('/widgets', (req, res) => {
     Fast2User_language: 'sv',
     __utmb: '77924038.4.10.1559489289',
   }
-  const badCookie = Object.entries(req.cookies).find(([key, val]) => correct[key] !== val)
-  const invalidQuery =
-    JSON.stringify(req.query) !==
-    JSON.stringify({ callback: 'jQuery', widgets: ['aptuslogin@APTUSPORT'] })
+  const correctQuery = { callback: 'jQuery', widgets: ['aptuslogin@APTUSPORT'] }
+  const badCookie = Object.entries(req.cookies).find(([key, val]) => correctCookies[key] !== val)
+  const invalidQuery = JSON.stringify(req.query) !== JSON.stringify(correctQuery)
   if (badCookie) {
     return res.status(400).json({
       msg: 'bad cookie',
-      expected: `${badCookie[0]}: ${correct[badCookie[0]]}`,
+      expected: `${badCookie[0]}: ${correctCookies[badCookie[0]]}`,
       got: `${badCookie[0]}: ${badCookie[1]}`,
     })
   } else if (invalidQuery) {
     return res.status(400).json({
       msg: 'bad query',
-      expected: JSON.stringify({ callback: 'jQuery', widgets: ['aptuslogin@APTUSPORT'] }),
+      expected: JSON.stringify(correctQuery),
       got: JSON.stringify(req.query),
     })
   } else {
-    return res
-      .status(302)
-      .send(
-        `jQuery({"html":{"alert":""},"data":{"aptuslogin@APTUSPORT":{"objekt":[{"objektNr":"KV7A1122 Kemivägen 7A","aptusUrl":"http://localhost:${PORT}?module=Lock&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]},"aptuslogin":{"objekt":[{"objektNr":"KV7A1122 Kemivägen 7A","aptusUrl":"https://apt-www.chalmersstudentbostader.se/aptusportal/Account/RemoteLogin?module=Booking&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]}},"javascripts":[],"messages":[],"events":[],"openWindow":null,"redirectUrl":null,"replaceUrl":null,"CSRFtoken":"d1edf10d-71d9-44d2-8917-99cc652fbfbc","fileResult":null});`,
-      )
+    return res.status(302).send(
+      `jQuery({"html":{"alert":""},"data":{"aptuslogin@APTUSPORT":{"objekt":[{"objektNr":"KV7A1122 Kemivägen 7A","aptusUrl":
+        "http://localhost:${PORT}/aptusportal/Account/RemoteLogin?module=Lock&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&
+        hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]},"aptuslogin":{"objekt":[{"objektNr":"KV7A1122 Kemivägen 7A","aptusUrl":
+        "https://apt-www.chalmersstudentbostader.se/aptusportal/Account/RemoteLogin?module=Booking&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&
+        hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]}},"javascripts":[],"messages":[],"events":[],"openWindow":null,"redirectUrl":null,"replaceUrl":null,"CSRFtoken":
+        "d1edf10d-71d9-44d2-8917-99cc652fbfbc","fileResult":null});`,
+    )
+  }
+})
+
+app.get('/aptusportal/Account/RemoteLogin', (req, res) => {
+  const correctQuery = {
+    module: 'Lock',
+    customerName: 'KV7A1122',
+    timestamp: '2019-06-02 18:20:08',
+    hash: '5BygwAGsFxW7Nz6kxgCcQn4xStI*',
+  }
+  const invalidQuery = JSON.stringify(req.query) !== JSON.stringify(correctQuery)
+  if (invalidQuery) {
+    return res.status(400).json({
+      msg: 'bad query',
+      expected: JSON.stringify(correctQuery),
+      got: JSON.stringify(req.query),
+    })
+  } else {
+    res.cookie('ASP.NET_SessionId', '1dxuv3ne3epk4b04ee4hi5bq', { httpOnly: true })
+    res.cookie(
+      '.ASPXAUTH',
+      `2D3EE8712E8B377395AF7FE09DA34EEF2F89A1D0ED1EC039CCA27FD749CE3A48047665D209838CA499D535D1138F25
+      FDB9A6FF92CA40F3A28614C706B87EF5D1AC9F03EA1CA1A0BDDCB2B969370528219A8A8C5250DEEA2762886F4451A0F531`,
+      { httpOnly: true },
+    )
+    return res.status(302).send('hej')
+  }
+})
+
+app.get('/AptusPortal/Lock/UnlockEntryDoor/116402', (req, res) => {
+  const correctCookies = {
+    '.ASPXAUTH': `2D3EE8712E8B377395AF7FE09DA34EEF2F89A1D0ED1EC039CCA27FD749CE3A48047665D209838CA499D535D1138F25
+    FDB9A6FF92CA40F3A28614C706B87EF5D1AC9F03EA1CA1A0BDDCB2B969370528219A8A8C5250DEEA2762886F4451A0F531`,
+    'ASP.NET_SessionId': '1dxuv3ne3epk4b04ee4hi5bq',
+  }
+  const badCookie = Object.entries(req.cookies).find(([key, val]) => correctCookies[key] !== val)
+  if (badCookie) {
+    return res.status(400).json({
+      msg: 'bad cookie',
+      expected: `${badCookie[0]}: ${correctCookies[badCookie[0]]}`,
+      got: `${badCookie[0]}: ${badCookie[1]}`,
+    })
+  } else {
+    // this in not the correct msg
+    return res.status(302).send('door unlocked')
   }
 })
