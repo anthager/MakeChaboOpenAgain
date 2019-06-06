@@ -4,8 +4,8 @@ const { logger } = require('../shared/utils')
 const { PORT } = require('../../../mock-server/src/variables')
 
 const urls =
-  process.env.NODE_ENV === 'test'
-    ? { csb: `localhost:${PORT}`, aptus: `localhost:${PORT}` }
+  process.env.NODE_ENV === 'mock'
+    ? { csb: `http://localhost:${PORT}`, aptus: `http://localhost:${PORT}` }
     : {
         csb: `https://www.chalmersstudentbostader.se`,
         aptus: `https://apt-www.chalmersstudentbostader.se`,
@@ -13,6 +13,7 @@ const urls =
 
 async function getCsbCookies() {
   let cookies
+  logger('nice')
   const res = await fetch(`${urls.csb}/wp-login.php`, {
     headers: {
       Accept:
@@ -32,10 +33,11 @@ async function getCsbCookies() {
       cookies = a
     }
   })
-  console.log('cookies:', cookies)
+  if (!/Fast2User_ssoIdHash.*wordpress_logged_in/.test(cookies)) {
+    throw new Error('login failed for some reason')
+  }
   logger('fetched csbCookies successfully...')
   const parsed = parseCookies(cookies)
-  console.log('parsed:', parsed)
   return parsed
 }
 
@@ -134,9 +136,8 @@ async function unlockDoor(doorID) {
     logger(unlockMsg)
     return { success: true }
   } catch (err) {
-    logger(err)
+    logger(err, 'error')
     return { success: false }
   }
 }
-// unlockDoor(116402)
 module.exports = { parseCookies, unlockDoor, getAptusUrlFromPayload }
