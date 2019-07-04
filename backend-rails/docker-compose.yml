@@ -1,0 +1,19 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:10.5
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: default
+    volumes:
+      - ./db/.pgdata:/var/lib/postgresql/data
+  # backend:
+  #   image: eu.gcr.io/hallonpaj/yata-backend:0.0.3
+  #   restart: always
+  #   ports:
+  #     - "4000:4000"
+  #   environment:
+  #     PRISMA_ENDPOINT: http://prisma
+  #     PRISMA_PORT: 4466
