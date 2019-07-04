@@ -4,11 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "nodemon src/index.js",
     "dev": "nodemon src/index.js",
     "test": "jest --watch"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
     "morgan": "^1.9.1"
@@ -18,7 +19,7 @@
     "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^24.1.0",
-    "nodemon": "^1.18.10",
+    "nodemon": "^1.19.1",
     "prettier": "^1.16.4"
   }
 }

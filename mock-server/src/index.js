@@ -1,10 +1,12 @@
 const express = require('express')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
-const { logger } = require('../../backend/src/shared/utils')
+const bodyParser = require('body-parser')
+const { logger } = require('../../backend-node/src/shared/utils')
 const { PORT } = require('./variables')
 
 const app = express()
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan(':method :url :status'))
 app.use(cookieParser())
 
@@ -16,6 +18,10 @@ app.listen(PORT, () => {
  * login
  */
 app.post('/wp-login.php', (req, res) => {
+  if (!req.body || req.body.pwd !== 'nice' || req.body.log !== 'nice') {
+    logger(`bad body: "${req.body || 'nonexistent'}"`)
+    return res.status(403).send('login was not provided')
+  }
   res.cookie('Fast2User_language', 'sv', { secure: true, httpOnly: true })
   res.cookie('PHPSESSID', 'ut5h573hif2mneh2scl38radn7')
   res.cookie('wordpress_test_cookie', 'WP+Cookie+check', { secure: true })
@@ -48,6 +54,7 @@ app.post('/wp-login.php', (req, res) => {
     '9606156157%7C1550098622%7C1tzzhstqCT8cyHxVzxMyqv7Rxu9Ehwcd030YnbmkXOU%7Caf17d64ea7b6551bf317dab206a1ca074c562dc25ce7910fc4914f1bef4dafd0',
     { secure: true, httpOnly: true },
   )
+  logger('login success!!')
   res.status(302).send('hej')
 })
 
@@ -55,6 +62,7 @@ app.post('/wp-login.php', (req, res) => {
  * get aptus url
  */
 app.get('/widgets', (req, res) => {
+  logger('-------')
   const correctCookies = {
     Fast2User_language: 'sv',
     PHPSESSID: 'ut5h573hif2mneh2scl38radn7',
