@@ -19,7 +19,9 @@ app.listen(PORT, () => {
  */
 app.post('/wp-login.php', (req, res) => {
   if (!req.body || req.body.pwd !== 'nice' || req.body.log !== 'nice') {
-    logger(`bad body: "${req.body || 'nonexistent'}"`)
+    logger(
+      `bad body: "${req.body ? 'pwd: ' + req.body.pwd + ', log: ' + req.body.log : 'nonexistent'}"`,
+    )
     return res.status(403).send('login was not provided')
   }
   res.cookie('Fast2User_language', 'sv', { secure: true, httpOnly: true })
@@ -141,6 +143,7 @@ app.get('/AptusPortal/Lock/UnlockEntryDoor/116402', (req, res) => {
     '.ASPXAUTH': `2D3EE8712E8B377395AF7FE09DA34EEF2F89A1D0ED1EC039CCA27FD749CE3A48047665D209838CA499D535D1138F25FDB9A6FF92CA40F3A28614C706B87EF5D1AC9F03EA1CA1A0BDDCB2B969370528219A8A8C5250DEEA2762886F4451A0F531`,
     'ASP.NET_SessionId': '1dxuv3ne3epk4b04ee4hi5bq',
   }
+  console.log(req.cookies)
   const badCookie = Object.entries(req.cookies).find(([key, val]) => correctCookies[key] !== val)
   if (badCookie) {
     logger('bad cookie')
@@ -151,6 +154,6 @@ app.get('/AptusPortal/Lock/UnlockEntryDoor/116402', (req, res) => {
     })
   } else {
     // this in not the correct msg
-    return res.status(302).send('door unlocked')
+    return res.status(200).json({ StatusText: 'Dörren är upplåst', HeaderStatusText: 'Status' })
   }
 })
