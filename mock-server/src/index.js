@@ -153,7 +153,7 @@ app.get('/AptusPortal/Lock/UnlockEntryDoor/116402', (req, res) => {
       got: `${badCookie[0]}: ${badCookie[1]}`,
     })
   } else {
-    // this in not the correct msg
+    logger('Success!')
     return res.status(200).json({ StatusText: 'Dörren är upplåst', HeaderStatusText: 'Status' })
   }
 })
