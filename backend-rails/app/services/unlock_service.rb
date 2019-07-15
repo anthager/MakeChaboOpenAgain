@@ -4,7 +4,7 @@ require 'httparty'
 require 'json'
 require 'awesome_print'
 
-class DoorOpenerService
+class UnlockService
   def initialize(csb_url, aptus_url, pwd, log)
     @csb_url = csb_url
     @aptus_url = aptus_url
@@ -94,13 +94,13 @@ class DoorOpenerService
   end
 end
 
-csb_url = 'http://localhost:1111'
-aptus_url = 'http://localhost:1111'
+# csb_url = 'http://localhost:1111'
+# aptus_url = 'http://localhost:1111'
 # csb_url = 'https://www.chalmersstudentbostader.se'
 # aptus_url = 'https://apt-www.chalmersstudentbostader.se'
 
-log = 'nice'
-pwd = 'nice'
+# log = 'nice'
+# pwd = 'nice'
 
 # url =
-DoorOpenerService.new(csb_url, aptus_url, pwd, log).unlock_door
+# DoorOpenerService.new(csb_url, aptus_url, pwd, log).unlock_door
