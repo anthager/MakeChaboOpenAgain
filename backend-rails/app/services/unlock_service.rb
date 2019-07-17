@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'httparty'
-require 'json'
-require 'awesome_print'
-
 class UnlockService
   def initialize(csb_url, aptus_url, pwd, log)
     @csb_url = csb_url
@@ -16,7 +12,8 @@ class UnlockService
     csb_cookies = get_csb_cookies(@csb_url, @pwd, @log)
     aptus_cookie_url = get_aptus_url(@csb_url, csb_cookies)
     aptus_cookies = get_aptus_cookies(aptus_cookie_url)
-    ap unlock(@aptus_url, aptus_cookies, '116402')
+    unlock(@aptus_url, aptus_cookies, '116402')
+    Rails.logger.info 'door unlocked'
   end
 
   private
@@ -93,14 +90,3 @@ class UnlockService
         .join('%20')
   end
 end
-
-# csb_url = 'http://localhost:1111'
-# aptus_url = 'http://localhost:1111'
-# csb_url = 'https://www.chalmersstudentbostader.se'
-# aptus_url = 'https://apt-www.chalmersstudentbostader.se'
-
-# log = 'nice'
-# pwd = 'nice'
-
-# url =
-# DoorOpenerService.new(csb_url, aptus_url, pwd, log).unlock_door
