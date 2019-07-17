@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class Opening < ApplicationRecord
-  validates :success, presence: true
+  validates :success, inclusion: { in: [true, false] }
 end
