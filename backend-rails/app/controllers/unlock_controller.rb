@@ -13,7 +13,7 @@ class UnlockController < ApplicationController
 
   def enough_time_has_passed_since_last_opening?
     threshold = ENV['THRESHOLD'].to_f
-    latest = Opening.where(success: true).maximum('created_at')
+    latest = Opening.where(success: true).maximum('created_at') || 0
     time_since_latest = Time.now - latest
     return false, threshold - time_since_latest if time_since_latest < threshold
 
