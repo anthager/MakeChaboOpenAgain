@@ -1,0 +1,21 @@
+defaults: &defaults
+
+  csb_url: 'http://localhost:1111'
+  aptus_url: 'http://localhost:1111'
+  log: 'nice'
+  pwd: 'nice'
+  threshold: 8
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+production:
+  csb_url: 'https://www.chalmersstudentbostader.se'
+  aptus_url: 'https://apt-www.chalmersstudentbostader.se'
+  <<: *defaults
