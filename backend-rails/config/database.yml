@@ -2,18 +2,18 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-
-development:
-  <<: *default
-  database: makechaboopenagain
   username: default
   password: default
   host: localhost
   port: 5432
 
+development:
+  <<: *default
+  database: makechaboopenagain
+
 test:
   <<: *default
-  database: backend-rails_test
+  database: makechaboopenagain_test
 
 production:
   <<: *default
