@@ -21,6 +21,11 @@ class ConfigService
     config_hash ['aptus_url']
   end
 
+  def threshold
+    config_hash = config
+    config_hash ['threshold']
+  end
+
   private
 
   def config
