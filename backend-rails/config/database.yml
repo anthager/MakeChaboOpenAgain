@@ -9,7 +9,7 @@ default: &default
 
 development:
   <<: *default
-  database: makechaboopenagain
+  database: makechaboopenagain_development
 
 test:
   <<: *default
@@ -17,6 +17,6 @@ test:
 
 production:
   <<: *default
-  database: backend-rails_production
-  username: backend-rails
-  password: <%= ENV['BACKEND-RAILS_DATABASE_PASSWORD'] %>
+  database: makechaboopenagain_production
+  username: default
+  password: <%= ENV['DATABASE_PASSWORD'] %>
