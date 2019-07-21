@@ -5,7 +5,7 @@ module.exports = {
     client: 'postgresql',
     connection: {
       database: 'make_chabo_open_again',
-      user: 'admin',
+      user: 'mcoa_app',
       password: 'password',
     },
     pool: {
@@ -25,9 +25,9 @@ module.exports = {
   staging: {
     client: 'postgresql',
     connection: {
-      database: 'my_db',
-      user: 'username',
-      password: 'password',
+      database: 'make_chabo_open_again',
+      user: 'mcoa_app',
+      password: process.env.DB_PASSWORD,
     },
     pool: {
       min: 2,
@@ -45,9 +45,9 @@ module.exports = {
   production: {
     client: 'postgresql',
     connection: {
-      database: 'my_db',
-      user: 'username',
-      password: 'password',
+      database: 'make_chabo_open_again',
+      user: 'mcoa_app',
+      password: process.env.DB_PASSWORD,
     },
     pool: {
       min: 2,

@@ -5,7 +5,7 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: admin
+      POSTGRES_USER: mcoa_app
       POSTGRES_PASSWORD: password
       POSTGRES_DB: make_chabo_open_again
     volumes:
