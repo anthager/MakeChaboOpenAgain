@@ -36,7 +36,6 @@ module.exports = require('knex')(
         tableName: 'knex_migrations',
         directory: 'db/migrations',
       },
-
       seeds: {
         directory: 'db/seeds-test',
       },
