@@ -1,5 +1,5 @@
-exports.up = function(knex) {
-  return knex.schema.createTable('unlocks', function(table) {
+exports.up = knex => {
+  return knex.schema.createTable('unlocks', table => {
     table.increments()
     table.boolean('success').notNullable()
     table.timestamp('created_at').defaultTo(knex.fn.now())
@@ -7,6 +7,6 @@ exports.up = function(knex) {
   })
 }
 
-exports.down = function(knex) {
+exports.down = knex => {
   return knex.schema.dropTable('unlocks')
 }
