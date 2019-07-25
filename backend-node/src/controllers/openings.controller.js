@@ -1,14 +1,20 @@
 const { hasEnoughTimePassed, addUnlock } = require('../services/unlock-guard.service')
+const { unlockDoor } = require('../services/unlock.service')
 
 const THRESHOLD = process.env.THRESHOLD || 8000
 
 const unlock = ('/',
 async (req, res) => {
-  const result = await hasEnoughTimePassed(THRESHOLD)
-  if (result.success) {
-    await addUnlock(true)
+  try {
+    const result = await hasEnoughTimePassed(THRESHOLD)
+    const success = result.success && (await unlockDoor()).success
+    await addUnlock(success)
+    console.log(`success: ${success}`)
+    res.status(200).json({ success, wait: result.wait })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ success: false })
   }
-  res.status(200).json(result)
 })
 
 module.exports = { unlock }
