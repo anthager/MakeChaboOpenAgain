@@ -1,4 +1,4 @@
-const { hasEnoughTimePassed, addUnlock } = require('../services/unlock.service')
+const { hasEnoughTimePassed, addUnlock } = require('../services/unlock-guard.service')
 
 const THRESHOLD = process.env.THRESHOLD || 8000
 
