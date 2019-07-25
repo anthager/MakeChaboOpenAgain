@@ -13,12 +13,13 @@ async function hasEnoughTimePassed(threshold) {
 }
 
 async function getTimeOfLastSuccessful() {
-  return (await knex.raw(
+  const result = (await knex.raw(
     `SELECT u1.created_at latest
 		FROM unlocks AS u1 
 		JOIN (SELECT MAX(id) id FROM unlocks WHERE success = true) AS u2
 		ON u1.id = u2.id;`,
-  )).rows[0].latest
+  )).rows[0]
+  return result && result.latest
 }
 
 async function addUnlock(success) {
