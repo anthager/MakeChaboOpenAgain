@@ -6,6 +6,7 @@ const defaultConfig = {
   CSB_URL: 'http://localhost:1111',
   APTUS_URL: 'http://localhost:1111',
   THRESHOLD: 8000,
+  nice: 'test',
 }
 const configs = {
   test: {},
