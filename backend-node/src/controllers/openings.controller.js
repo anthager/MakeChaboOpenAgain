@@ -1,12 +1,11 @@
 const { hasEnoughTimePassed, addUnlock } = require('../services/unlock-guard.service')
 const { unlockDoor } = require('../services/unlock.service')
-
-const THRESHOLD = process.env.THRESHOLD || 8000
+const config = require('../config').config
 
 const unlock = ('/',
 async (req, res) => {
   try {
-    const result = await hasEnoughTimePassed(THRESHOLD)
+    const result = await hasEnoughTimePassed(config.THRESHOLD)
     const success = result.success && (await unlockDoor()).success
     await addUnlock(success)
     console.log(`success: ${success}`)

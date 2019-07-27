@@ -1,16 +1,10 @@
 const fetch = require('node-fetch')
-const dotenv = require('dotenv')
-dotenv.config()
-
-const aptusUrl = process.env.APTUS_URL
-const csbUrl = process.env.CSB_URL
-const pwd = process.env.PASSWORD
-const log = process.env.LOG
+const config = require('../config').config
 
 async function getCsbCookies() {
   let cookies
-  console.log(csbUrl)
-  const res = await fetch(`${csbUrl}/wp-login.php`, {
+  console.log(config.CSB_URL)
+  const res = await fetch(`${config.CSB_URL}/wp-login.php`, {
     headers: {
       Accept:
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -21,7 +15,9 @@ async function getCsbCookies() {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     redirect: 'manual',
-    body: `log=${log}&pwd=${pwd}&redirect_to=https%3A%2F%2Fwww.chalmersstudentbostader.se%2Fmin-bostad%2F`,
+    body: `log=${config.LOG}&pwd=${
+      config.PASSWORD
+    }&redirect_to=https%3A%2F%2Fwww.chalmersstudentbostader.se%2Fmin-bostad%2F`,
     method: 'POST',
   })
   res.headers.forEach((a, b) => {
@@ -39,7 +35,7 @@ async function getCsbCookies() {
 
 async function getUrlToAptus(cookies) {
   const body = await (await fetch(
-    `${csbUrl}/widgets/?callback=jQuery&widgets%5B%5D=aptuslogin%40APTUSPORT`,
+    `${config.CSB_URL}/widgets/?callback=jQuery&widgets%5B%5D=aptuslogin%40APTUSPORT`,
     {
       credentials: 'include',
       headers: {
@@ -85,7 +81,7 @@ async function getAptusCookies(url) {
 }
 
 async function _unlockDoor(cookie, doorID) {
-  return (await fetch(`${aptusUrl}/AptusPortal/Lock/UnlockEntryDoor/${doorID}`, {
+  return (await fetch(`${config.APTUS_URL}/AptusPortal/Lock/UnlockEntryDoor/${doorID}`, {
     credentials: 'include',
     headers: {
       accept: '*/*',
