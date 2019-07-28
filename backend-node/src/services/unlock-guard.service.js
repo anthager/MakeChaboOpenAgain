@@ -19,7 +19,7 @@ async function getTimeOfLastSuccessful() {
 		JOIN (SELECT MAX(id) id FROM unlocks WHERE success = true) AS u2
 		ON u1.id = u2.id;`,
   )).rows[0]
-  return result && result.latest
+  return (result && result.latest) || 0
 }
 
 async function addUnlock(success) {
