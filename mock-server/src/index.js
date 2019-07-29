@@ -2,8 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const { logger } = require('../../backend-node/src/shared/utils')
-const { PORT } = require('./variables')
+const PORT = process.env.PORT || 1111
 
 const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -19,7 +18,7 @@ app.listen(PORT, () => {
  */
 app.post('/wp-login.php', (req, res) => {
   if (!req.body || req.body.pwd !== 'nice' || req.body.log !== 'nice') {
-    logger(
+    console.log(
       `bad body: "${req.body ? 'pwd: ' + req.body.pwd + ', log: ' + req.body.log : 'nonexistent'}"`,
     )
     return res.status(403).send('login was not provided')
@@ -56,7 +55,7 @@ app.post('/wp-login.php', (req, res) => {
     '9606156157%7C1550098622%7C1tzzhstqCT8cyHxVzxMyqv7Rxu9Ehwcd030YnbmkXOU%7Caf17d64ea7b6551bf317dab206a1ca074c562dc25ce7910fc4914f1bef4dafd0',
     { secure: true, httpOnly: true },
   )
-  logger('login success!!')
+  console.log('login success!!')
   res.status(302).send('hej')
 })
 
@@ -64,7 +63,7 @@ app.post('/wp-login.php', (req, res) => {
  * get aptus url
  */
 app.get('/widgets', (req, res) => {
-  logger('-------')
+  console.log('-------')
   const correctCookies = {
     Fast2User_language: 'sv',
     PHPSESSID: 'ut5h573hif2mneh2scl38radn7',
@@ -83,14 +82,14 @@ app.get('/widgets', (req, res) => {
   const badCookie = Object.entries(req.cookies).find(([key, val]) => correctCookies[key] !== val)
   const invalidQuery = JSON.stringify(req.query) !== JSON.stringify(correctQuery)
   if (badCookie) {
-    logger('bad cookies')
+    console.log('bad cookies')
     return res.status(400).json({
       msg: 'bad cookie',
       expected: `${badCookie[0]}: ${correctCookies[badCookie[0]]}`,
       got: `${badCookie[0]}: ${badCookie[1]}`,
     })
   } else if (invalidQuery) {
-    logger('bad cookies')
+    console.log('bad cookies')
     return res.status(400).json({
       msg: 'bad query',
       expected: JSON.stringify(correctQuery),
@@ -146,14 +145,14 @@ app.get('/AptusPortal/Lock/UnlockEntryDoor/116402', (req, res) => {
   console.log(req.cookies)
   const badCookie = Object.entries(req.cookies).find(([key, val]) => correctCookies[key] !== val)
   if (badCookie) {
-    logger('bad cookie')
+    console.log('bad cookie')
     return res.status(400).json({
       msg: 'bad cookie',
       expected: `${badCookie[0]}: ${correctCookies[badCookie[0]]}`,
       got: `${badCookie[0]}: ${badCookie[1]}`,
     })
   } else {
-    logger('Success!')
+    console.log('Success!')
     return res.status(200).json({ StatusText: 'Dörren är upplåst', HeaderStatusText: 'Status' })
   }
 })
