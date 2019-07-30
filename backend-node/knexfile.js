@@ -1,3 +1,4 @@
+console.log('env', process.env.NODE_ENV)
 module.exports = require('knex')(
   {
     development: {
@@ -80,5 +81,5 @@ module.exports = require('knex')(
         directory: 'db/seeds',
       },
     },
-  }[process.env.NODE_ENV || 'development'],
+  }['test'],
 )

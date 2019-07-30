@@ -1,4 +1,4 @@
-version: 2.1
+version: 2
 
 jobs:
   build-frontend:
@@ -31,26 +31,34 @@ jobs:
       - run: mv build ${CIRCLE_BRANCH}-build
       - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "antonhagermalm@open.anton.pizza:/open.anton.pizza/builds"
 
-  build-backend:
+  build-and-test-backend:
     docker:
         - image: circleci/node:10.15
+          environment:
+            NODE_ENV: "test"
+        - image: antonhager/mcoa_mock_server
+        - image: postgres:10.5
+          environment:
+            POSTGRES_USER: mcoa_app
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: make_chabo_open_again_test
     working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
           keys:
-            - frontend-dep-{{ checksum "frontend/package.json" }}
-            - frontend-dep-
-      - run: yarn --cwd frontend install
+            - backend-node-dep-{{ checksum "backend-node/yarn.lock" }}
+            - backend-node-dep
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run: yarn --cwd backend-node install
+      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: yarn --cwd backend-node run test
       - save_cache:
           paths:
-            - frontend/node_modules
-          key: frontend-dep-{{ checksum "frontend/package.json" }}
-      - run: yarn --cwd frontend run build
-      - persist_to_workspace:
-          root: frontend
-          paths:
-            - build
+            - backend-node/node_modules
+          key: backend-node-dep-{{ checksum "backend-node/yarn.lock" }}
+      - run: docker build -t $DOCKER_USERNAME/backend backend-node/ && docker push $DOCKER_USERNAME/backend
 
   deploy-backend:
     docker:
@@ -60,7 +68,16 @@ jobs:
           at: build
       - run: mv build ${CIRCLE_BRANCH}-build
       - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "ci@open.anton.pizza:/open.anton.pizza/builds"
-      
+
+  build-mock-server:
+    docker:
+        - image: circleci/node:10.15
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run: docker build -t $DOCKER_USERNAME/mcoa_mock_server mock-server/ && docker push $DOCKER_USERNAME/mcoa_mock_server
 
 workflows:
   version: 2
@@ -86,5 +103,6 @@ workflows:
       - deploy-frontend:
           requires:
             - build-frontend
-
-  
+  build-backend:
+    jobs: 
+      - build-and-test-backend
