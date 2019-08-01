@@ -105,4 +105,8 @@ workflows:
             - build-frontend
   build-backend:
     jobs: 
-      - build-and-test-backend
+      - build-and-test-backend:
+          filters:
+            branches: 
+              only: /staging|master/
+      
