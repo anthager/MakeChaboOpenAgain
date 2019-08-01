@@ -1,4 +1,3 @@
 FROM debian
-WORKDIR /usr/src
-COPY populate-www.sh .
-CMD ['/usr/src/populate-www.sh']
+COPY populate-www.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/populate-www.sh

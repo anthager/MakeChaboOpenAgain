@@ -8,7 +8,7 @@ certbot/certbot certonly \
 --webroot \
 --webroot-path /var/www/certbot \
 --email hej@anton.pizza \
--d "beta.open.anton.pizza" \
--d "beta.api.open.anton.pizza" \
--d "beta.staging.open.anton.pizza" \
--d "beta.staging.api.open.anton.pizza" \
+-d "open.anton.pizza" \
+-d "api.open.anton.pizza" \
+-d "staging.open.anton.pizza" \
+-d "staging.api.open.anton.pizza" \
