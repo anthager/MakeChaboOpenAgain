@@ -6,4 +6,5 @@ docker run \
 -p 443:443 \
 -v "certs:/certs" \
 -v "www:/var/www" \
-antonhager/main_server:0.1.5
+--restart=always \
+antonhager/main_server:0.2.0
