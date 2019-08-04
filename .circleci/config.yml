@@ -28,8 +28,9 @@ jobs:
     steps:
       - attach_workspace:
           at: build
-      - run: mv build ${CIRCLE_BRANCH}-build
-      - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "antonhagermalm@open.anton.pizza:/open.anton.pizza/builds"
+      - run: mv build ${CIRCLE_BRANCH}-${$CIRCLE_WORKFLOW_ID}
+      - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-${$CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds"
+      - run: ssh -r -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${CIRCLE_BRANCH}; ln -s /var/www/builds/${CIRCLE_BRANCH}-${$CIRCLE_WORKFLOW_ID} /var/www/${CIRCLE_BRANCH}"
 
   build-and-test-backend:
     docker:
@@ -58,16 +59,14 @@ jobs:
           paths:
             - backend-node/node_modules
           key: backend-node-dep-{{ checksum "backend-node/yarn.lock" }}
-      - run: docker build -t $DOCKER_USERNAME/backend backend-node/ && docker push $DOCKER_USERNAME/backend
+      - run: docker build -t $DOCKER_USERNAME/mcoa-backend:$CIRCLE_WORKFLOW_ID backend-node/ && docker push $DOCKER_USERNAME/mcoa-backend:$CIRCLE_WORKFLOW_ID
 
   deploy-backend:
     docker:
         - image: circleci/node:10.15
     steps:
-      - attach_workspace:
-          at: build
-      - run: mv build ${CIRCLE_BRANCH}-build
-      - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-build" "ci@open.anton.pizza:/open.anton.pizza/builds"
+      - run: ssh -r -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker kill mcoa-backend-${CIRCLE_BRANCH}; docker rm mcoa-backend-${CIRCLE_BRANCH} && docker run --name mcoa-backend-${CIRCLE_BRANCH} --network swag --env-file .${CIRCLE_BRANCH}.env ${}$DOCKER_USERNAME/mcoa-backend:$CIRCLE_WORKFLOW_ID"
+          
 
   build-mock-server:
     docker:
@@ -77,7 +76,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - run: docker build -t $DOCKER_USERNAME/mcoa_mock_server mock-server/ && docker push $DOCKER_USERNAME/mcoa_mock_server
+      - run: docker build -t $DOCKER_USERNAME/mcoa-mock-server:$CIRCLE_WORKFLOW_ID mock-server/ && docker push $DOCKER_USERNAME/mcoa-mock-server:$CIRCLE_WORKFLOW_ID
 
 workflows:
   version: 2
@@ -105,8 +104,9 @@ workflows:
             - build-frontend
   build-backend:
     jobs: 
-      - build-and-test-backend:
-          filters:
-            branches: 
-              only: /staging|master/
+      - build-and-test-backend
+      # - build-and-test-backend:
+      #     filters:
+      #       branches: 
+      #         only: /staging|master/
       
