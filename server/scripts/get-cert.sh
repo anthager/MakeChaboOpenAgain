@@ -3,7 +3,7 @@ set -e
 
 docker run --rm -it \
 -v "certs:/etc/letsencrypt" \
--v "www:/var/www" \
+-v "/var/www:/var/www" \
 certbot/certbot certonly \
 --webroot \
 --webroot-path /var/www/certbot \
