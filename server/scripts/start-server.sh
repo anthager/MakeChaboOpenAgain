@@ -5,6 +5,8 @@ docker run \
 -p 80:80 \
 -p 443:443 \
 -v "certs:/certs" \
--v "www:/var/www" \
+-v "$(pwd)/www:/var/www" \
+--name main_server \
 --restart=always \
-antonhager/main_server:0.2.0
+--network swag \
+antonhager/main_server:$TAG
