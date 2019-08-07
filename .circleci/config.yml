@@ -2,6 +2,9 @@ version: 2
 
 jobs:
   build-frontend:
+    environment:
+      CIRCLE_BRANCH: staging
+      CIRCLE_WORKFLOW_ID: 4371cedd-8c7d-4f06-a076-4668bb8b33da
     docker:
         - image: circleci/node:10.15
     working_directory: ~/repo
@@ -9,13 +12,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-dep-{{ checksum "frontend/base/yarn.lock" }}
-            - frontend-dep-
+            - frontend-dep
       - run: yarn --cwd frontend install
       - save_cache:
+          key: frontend-dep
           paths:
             - frontend/node_modules
-          key: frontend-dep-{{ checksum "frontend/base/yarn.lock" }}
       - run: yarn --cwd frontend run build
       - persist_to_workspace:
           root: frontend
@@ -23,14 +25,18 @@ jobs:
             - build
 
   deploy-frontend:
+    environment:
+      CIRCLE_BRANCH: staging
+      CIRCLE_WORKFLOW_ID: 4371cedd-8c7d-4f06-a076-4668bb8b33da
     docker:
         - image: circleci/node:10.15
     steps:
       - attach_workspace:
           at: build
-      - run: mv build ${CIRCLE_BRANCH}-${$CIRCLE_WORKFLOW_ID}
-      - run: scp -r -oStrictHostKeyChecking=no "${CIRCLE_BRANCH}-${$CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds"
-      - run: ssh -r -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${CIRCLE_BRANCH}; ln -s /var/www/builds/${CIRCLE_BRANCH}-${$CIRCLE_WORKFLOW_ID} /var/www/${CIRCLE_BRANCH}"
+      - run: mv build "${CIRCLE_BRANCH}:${CIRCLE_WORKFLOW_ID}"
+      - run: ls
+      - run: scp -r -oStrictHostKeyChecking=no "./${CIRCLE_BRANCH}:${CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds/${CIRCLE_BRANCH}"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${CIRCLE_BRANCH}; ln -s /var/www/builds/${CIRCLE_BRANCH}/${CIRCLE_BRANCH}:${CIRCLE_WORKFLOW_ID} /var/www/${CIRCLE_BRANCH}"
 
   build-and-test-backend:
     docker:
@@ -59,14 +65,16 @@ jobs:
           paths:
             - backend-node/node_modules
           key: backend-node-dep-{{ checksum "backend-node/yarn.lock" }}
-      - run: docker build -t $DOCKER_USERNAME/mcoa-backend:$CIRCLE_WORKFLOW_ID backend-node/ && docker push $DOCKER_USERNAME/mcoa-backend:$CIRCLE_WORKFLOW_ID
+      - run: docker build -t ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID} backend-node/ && docker push ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID}
 
   deploy-backend:
+    environment:
+      CIRCLE_BRANCH: staging
+      CIRCLE_WORKFLOW_ID: 4371cedd-8c7d-4f06-a076-4668bb8b33da
     docker:
         - image: circleci/node:10.15
     steps:
-      - run: ssh -r -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker kill mcoa-backend-${CIRCLE_BRANCH}; docker rm mcoa-backend-${CIRCLE_BRANCH} && docker run --name mcoa-backend-${CIRCLE_BRANCH} --network swag --env-file .${CIRCLE_BRANCH}.env ${}$DOCKER_USERNAME/mcoa-backend:$CIRCLE_WORKFLOW_ID"
-          
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "mcoa_backend_$CIRCLE_BRANCH" && docker kill mcoa_backend_$CIRCLE_BRANCH; docker ps -a | grep "mcoa_backend_$CIRCLE_BRANCH" && docker rm mcoa_backend_$CIRCLE_BRANCH; docker run --name mcoa_backend_$CIRCLE_BRANCH --network swag --env-file /var/.envs/.$CIRCLE_BRANCH.env -d $DOCKER_USERNAME/mcoa_backend:$CIRCLE_WORKFLOW_ID"
 
   build-mock-server:
     docker:
@@ -76,7 +84,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - run: docker build -t $DOCKER_USERNAME/mcoa-mock-server:$CIRCLE_WORKFLOW_ID mock-server/ && docker push $DOCKER_USERNAME/mcoa-mock-server:$CIRCLE_WORKFLOW_ID
+      - run: docker build -t $DOCKER_USERNAME/mcoa_mock_server:${CIRCLE_WORKFLOW_ID} mock-server/ && docker push $DOCKER_USERNAME/mcoa_mock_server:${CIRCLE_WORKFLOW_ID}
 
 workflows:
   version: 2
@@ -91,22 +99,20 @@ workflows:
           requires:
             - build-frontend
   
-  build-deploy-prod:
+  frontend:
     jobs:
-      - build-frontend:
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+      - build-frontend
+          
+            
       - deploy-frontend:
           requires:
             - build-frontend
-  build-backend:
+  backend:
     jobs: 
-      - build-and-test-backend
-      # - build-and-test-backend:
-      #     filters:
-      #       branches: 
-      #         only: /staging|master/
-      
+      - build-and-test-backend:
+          filters:
+            branches: 
+              only: /staging|master/
+      - deploy-backend:
+          requires:
+            - build-and-test-backend
