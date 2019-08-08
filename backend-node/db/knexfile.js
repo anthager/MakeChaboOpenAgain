@@ -2,7 +2,7 @@ module.exports = {
   development: {
     client: 'postgresql',
     connection: {
-      database: 'make_chabo_open_again_dev',
+      database: 'mcoa_dev',
       user: 'mcoa_app',
       password: 'password',
     },
@@ -22,7 +22,7 @@ module.exports = {
   test: {
     client: 'postgresql',
     connection: {
-      database: 'make_chabo_open_again_test',
+      database: 'mcoa_test',
       user: 'mcoa_app',
       password: 'password',
     },
@@ -32,10 +32,10 @@ module.exports = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: 'migrations',
+      directory: 'db/migrations',
     },
     seeds: {
-      directory: 'seeds-test',
+      directory: 'db/seeds-test',
     },
   },
 
