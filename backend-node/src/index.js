@@ -1,11 +1,7 @@
 const express = require('express')
 const router = require('./router')
-const configService = require('./config')
 const knex = require('../db/knex')
 const reconnectInterval = 5000
-
-configService.load()
-const config = configService.config
 
 const app = express()
 const PORT = process.env.PORT || 8080
@@ -20,7 +16,7 @@ if (process.env.NODE_ENV !== 'test') {
     await isDatabaseUp()
     app.listen(PORT, () => {
       console.log(`App listening on port ${PORT}`)
-      console.log(`using config:\n`, config)
+      console.log(`using config:\n`)
     })
   })()
 }
