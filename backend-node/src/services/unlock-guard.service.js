@@ -1,4 +1,4 @@
-const knex = require('../../knexfile')
+const knex = require('../../db/knex')
 
 async function hasEnoughTimePassed(threshold) {
   if (typeof threshold !== 'number') {

@@ -1,4 +1,4 @@
-const knex = require('../knexfile')
+const knex = require('../db/knex')
 const request = require('supertest')
 const app = require('../src/index')
 
