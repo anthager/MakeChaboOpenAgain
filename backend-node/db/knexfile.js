@@ -42,9 +42,10 @@ module.exports = {
   staging: {
     client: 'postgresql',
     connection: {
-      database: 'make_chabo_open_again_staging',
+      database: process.env.DB,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
+      host: process.env.DB_HOST,
     },
     pool: {
       min: 2,
@@ -62,9 +63,10 @@ module.exports = {
   production: {
     client: 'postgresql',
     connection: {
-      database: 'make_chabo_open_again_prod',
+      database: process.env.DB,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
+      host: process.env.DB_HOST,
     },
     pool: {
       min: 2,
