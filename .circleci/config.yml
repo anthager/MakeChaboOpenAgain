@@ -2,9 +2,6 @@ version: 2
 
 jobs:
   build-frontend:
-    environment:
-      CIRCLE_BRANCH: staging
-      CIRCLE_WORKFLOW_ID: 4371cedd-8c7d-4f06-a076-4668bb8b33da
     docker:
         - image: circleci/node:10.15
     working_directory: ~/repo
@@ -25,9 +22,6 @@ jobs:
             - build
 
   deploy-frontend:
-    environment:
-      CIRCLE_BRANCH: staging
-      CIRCLE_WORKFLOW_ID: 4371cedd-8c7d-4f06-a076-4668bb8b33da
     docker:
         - image: circleci/node:10.15
     steps:
@@ -68,9 +62,6 @@ jobs:
       - run: docker build -t ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID} backend-node/ && docker push ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID}
 
   deploy-backend:
-    environment:
-      CIRCLE_BRANCH: staging
-      CIRCLE_WORKFLOW_ID: 4371cedd-8c7d-4f06-a076-4668bb8b33da
     docker:
         - image: circleci/node:10.15
     steps:
@@ -101,9 +92,10 @@ workflows:
   
   frontend:
     jobs:
-      - build-frontend
-          
-            
+      - build-frontend:
+          filters:
+            branches: 
+              only: /staging|master/
       - deploy-frontend:
           requires:
             - build-frontend
