@@ -25,10 +25,11 @@ async function isDatabaseUp() {
   return new Promise(async res => {
     try {
       console.log('attempting to connect to database...')
-      await knex.raw('SELECT * FROM unlocks;')
+      await knex.migrate.latest()
       console.log('connected to database successfully')
       return res('nice')
     } catch (err) {
+      console.error(err)
       console.log(
         `connecting to database failed, attempting to reconnect in ${reconnectInterval}ms...`,
       )
