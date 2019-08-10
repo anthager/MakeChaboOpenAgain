@@ -23,16 +23,17 @@ jobs:
 
   deploy-frontend:
     docker:
-        - image: circleci/node:10.15
+        - image: google/cloud-sdk
     steps:
       - attach_workspace:
           at: build
-      - run: mv build "${CIRCLE_BRANCH}:${CIRCLE_WORKFLOW_ID}"
-      - run: ls
-      - run: scp -r -oStrictHostKeyChecking=no "./${CIRCLE_BRANCH}:${CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds/${CIRCLE_BRANCH}"
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${CIRCLE_BRANCH}; ln -s /var/www/builds/${CIRCLE_BRANCH}/${CIRCLE_BRANCH}:${CIRCLE_WORKFLOW_ID} /var/www/${CIRCLE_BRANCH}"
+      - run: echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+      - run: mv build/build "${STAGE}:${CIRCLE_WORKFLOW_ID}"
+      - run: gsutil cp -r "${STAGE}:${CIRCLE_WORKFLOW_ID}" "${BUCKET_URL}/${STAGE}"
+      - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:${CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds/${STAGE}"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:${CIRCLE_WORKFLOW_ID} /var/www/${STAGE}"
 
-  build-and-test-backend:
+  test-backend:
     docker:
         - image: circleci/node:10.15
           environment:
@@ -42,30 +43,51 @@ jobs:
           environment:
             POSTGRES_USER: mcoa_app
             POSTGRES_PASSWORD: password
-            POSTGRES_DB: make_chabo_open_again_test
+            POSTGRES_DB: mcoa_test
     working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
           keys:
-            - backend-node-dep-{{ checksum "backend-node/yarn.lock" }}
             - backend-node-dep
-      - setup_remote_docker
-      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - run: yarn --cwd backend-node install
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run: yarn --cwd backend-node run test
       - save_cache:
           paths:
             - backend-node/node_modules
-          key: backend-node-dep-{{ checksum "backend-node/yarn.lock" }}
+          key: backend-node-dep
+
+  build-backend:
+    docker:
+        - image: circleci/node:10.15
+          environment:
+            NODE_ENV: "test"
+        - image: antonhager/mcoa_mock_server
+        - image: postgres:10.5
+          environment:
+            POSTGRES_USER: mcoa_app
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: mcoa_test
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - backend-node-dep
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - save_cache:
+          paths:
+            - backend-node/node_modules
+          key: backend-node-dep
       - run: docker build -t ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID} backend-node/ && docker push ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID}
 
   deploy-backend:
     docker:
         - image: circleci/node:10.15
     steps:
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "mcoa_backend_$CIRCLE_BRANCH" && docker kill mcoa_backend_$CIRCLE_BRANCH; docker ps -a | grep "mcoa_backend_$CIRCLE_BRANCH" && docker rm mcoa_backend_$CIRCLE_BRANCH; docker run --name mcoa_backend_$CIRCLE_BRANCH --network swag --env-file /var/.envs/.$CIRCLE_BRANCH.env -d $DOCKER_USERNAME/mcoa_backend:$CIRCLE_WORKFLOW_ID"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "mcoa_backend_$STAGE" && docker kill mcoa_backend_$STAGE; docker ps -a | grep "mcoa_backend_$STAGE" && docker rm mcoa_backend_$STAGE; docker run --name mcoa_backend_$STAGE --network swag --env-file /var/.envs/.$STAGE.env -d $DOCKER_USERNAME/mcoa_backend:$CIRCLE_WORKFLOW_ID"
 
   build-mock-server:
     docker:
@@ -80,31 +102,59 @@ jobs:
 workflows:
   version: 2
 
-  build-deploy-staging:
+  frontend-prod:
     jobs:
       - build-frontend:
-          filters:
-            branches:
-              only: staging
-      - deploy-frontend:
-          requires:
-            - build-frontend
-  
-  frontend:
-    jobs:
-      - build-frontend:
+          context: production
           filters:
             branches: 
-              only: /staging|master/
+              only: /master/
       - deploy-frontend:
+          context: production
           requires:
             - build-frontend
-  backend:
+
+  backend-prod:
     jobs: 
-      - build-and-test-backend:
+      - test-backend:
+          context: production
           filters:
             branches: 
-              only: /staging|master/
-      - deploy-backend:
+              only: /master/
+      - build-backend:
+          context: production
           requires:
-            - build-and-test-backend
+            - test-backend
+      - deploy-backend:
+          context: production
+          requires:
+            - build-backend
+
+  frontend-staging:
+    jobs:
+      - build-frontend:
+          context: staging
+          filters:
+            branches: 
+              only: /staging/
+      - deploy-frontend:
+          context: staging
+          requires:
+            - build-frontend
+
+  backend-staging:
+    jobs: 
+      - test-backend:
+          context: staging
+          filters:
+            branches: 
+              only: /staging/
+      - build-backend:
+          context: staging
+          requires:
+            - test-backend
+      - deploy-backend:
+          context: staging
+          requires:
+            - build-backend
+      
