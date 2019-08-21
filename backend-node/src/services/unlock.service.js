@@ -1,9 +1,9 @@
 const fetch = require('node-fetch')
 
-const CSB_URL = 'http://localhost:1111' || process.env.CSB_URL
-const APTUS_URL = 'http://localhost:1111' || process.env.APTUS_URL
-const LOG = 'nice' || process.env.LOG
-const PASSWORD = 'nice' || process.env.PASSWORD
+const CSB_URL = process.env.CSB_URL || 'http://localhost:1111'
+const APTUS_URL = process.env.APTUS_URL || 'http://localhost:1111'
+const LOG = process.env.LOG || 'nice'
+const PASSWORD = process.env.PASSWORD || 'nice'
 
 console.log(`${CSB_URL}/wp-login.php`)
 async function getCsbCookies() {
