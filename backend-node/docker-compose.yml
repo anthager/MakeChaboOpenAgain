@@ -7,8 +7,8 @@ services:
     environment:
       POSTGRES_USER: mcoa_app
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: make_chabo_open_again_${NODE_ENV:-development}
+      POSTGRES_DB: mcoa_dev
   mock_server:
-    image: antonhager/mcoa_mock_server:latest
+    image: antonhager/mcoa_mock_server:1.0.0
     ports:
       - '1111:1111'
