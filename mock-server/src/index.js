@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+const hostname = require('os').hostname()
 const PORT = process.env.PORT || 1111
 
 const app = express()
@@ -12,10 +13,12 @@ app.use(cookieParser())
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
 })
+
 /**
  * health check
  */
 app.get('/', (req, res) => {
+  console.log('hostname:', hostname)
   res.status(200).json('Quite alright thanks')
 })
 
@@ -104,9 +107,9 @@ app.get('/widgets', (req, res) => {
   } else {
     return res.status(302).send(
       `jQuery({"html":{"alert":""},"data":{"aptuslogin@APTUSPORT":{"objekt":[{"objektNr":"KV7A1122 Kemivägen 7A","aptusUrl":
-      "http://localhost:${PORT}/aptusportal/Account/RemoteLogin?module=Lock&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]},
+      "http://${hostname}:${PORT}/aptusportal/Account/RemoteLogin?module=Lock&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]},
       "aptuslogin":{"objekt":[{"objektNr":"KV7A1122 Kemivägen 7A","aptusUrl":
-      "http://localhost:${PORT}/aptusportal/Account/RemoteLogin?module=Booking&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]}},"javascripts":[],
+      "http://${hostname}:${PORT}/aptusportal/Account/RemoteLogin?module=Booking&customerName=KV7A1122&timestamp=2019-06-02 18:20:08&hash=5BygwAGsFxW7Nz6kxgCcQn4xStI*"}]}},"javascripts":[],
       "messages":[],"events":[],"openWindow":null,"redirectUrl":null,"replaceUrl":null,"CSRFtoken":"d1edf10d-71d9-44d2-8917-99cc652fbfbc","fileResult":null});`,
     )
   }
