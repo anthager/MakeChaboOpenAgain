@@ -12,6 +12,12 @@ app.use(cookieParser())
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
 })
+/**
+ * health check
+ */
+app.get('/', (req, res) => {
+  res.status(200).json('Quite alright thanks')
+})
 
 /**
  * login
