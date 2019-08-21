@@ -8,7 +8,6 @@ const PASSWORD = process.env.PASSWORD || 'nice'
 console.log(`${CSB_URL}/wp-login.php`)
 async function getCsbCookies() {
   let cookies
-  console.log(CSB_URL)
   const res = await fetch(`${CSB_URL}/wp-login.php`, {
     headers: {
       Accept:
@@ -31,8 +30,8 @@ async function getCsbCookies() {
   if (!/Fast2User_ssoIdHash.*wordpress_logged_in/.test(cookies)) {
     throw new Error('login failed for some reason')
   }
-  console.log('fetched csbCookies successfully...')
   const parsed = parseCookies(cookies)
+  console.log(`fetched csbCookies successfully: ${parsed}`)
   return parsed
 }
 
@@ -57,8 +56,9 @@ async function getUrlToAptus(cookies) {
       method: 'GET',
     },
   )).text()
-  console.log('fetched aptusUrl successfully...')
-  return getAptusUrlFromPayload(body)
+  const aptusURL = getAptusUrlFromPayload(body)
+  console.log(`fetched aptusUrl successfully: ${aptusURL}`)
+  return aptusURL
 }
 
 async function getAptusCookies(url) {
@@ -79,8 +79,9 @@ async function getAptusCookies(url) {
       cookies = value
     }
   })
-  console.log('fetched aptusCookies successfully...')
-  return parseCookies(cookies)
+  const parsed = parseCookies(cookies)
+  console.log(`fetched aptusCookies successfully: ${parsed}`)
+  return parsed
 }
 
 async function _unlockDoor(cookie, doorID) {
