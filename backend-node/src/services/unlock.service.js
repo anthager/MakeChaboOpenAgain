@@ -5,7 +5,6 @@ const APTUS_URL = process.env.APTUS_URL || 'http://localhost:1111'
 const LOG = process.env.LOG || 'nice'
 const PASSWORD = process.env.PASSWORD || 'nice'
 
-console.log(`${CSB_URL}/wp-login.php`)
 async function getCsbCookies() {
   let cookies
   const res = await fetch(`${CSB_URL}/wp-login.php`, {
