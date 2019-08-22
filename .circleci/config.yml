@@ -33,7 +33,7 @@ jobs:
       - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:${CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds/${STAGE}"
       - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:${CIRCLE_WORKFLOW_ID} /var/www/${STAGE}"
 
-  test-backend:
+  test-alohomora:
     docker:
         - image: circleci/node:10.15
           environment:
@@ -49,16 +49,16 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-node-dep
-      - run: yarn --cwd backend-node install
+            - alohomora-node-dep
+      - run: yarn --cwd alohomora install
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run: yarn --cwd backend-node run test
+      - run: yarn --cwd alohomora run test
       - save_cache:
           paths:
-            - backend-node/node_modules
-          key: backend-node-dep
+            - alohomora/node_modules
+          key: alohomora-dep
 
-  build-backend:
+  build-alohomora:
     docker:
         - image: circleci/node:10.15
           environment:
@@ -74,20 +74,20 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-node-dep
+            - alohomora-dep
       - setup_remote_docker
       - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - save_cache:
           paths:
-            - backend-node/node_modules
-          key: backend-node-dep
-      - run: docker build -t ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID} backend-node/ && docker push ${DOCKER_USERNAME}/mcoa_backend:${CIRCLE_WORKFLOW_ID}
+            - alohomora/node_modules
+          key: alohomora-dep
+      - run: docker build -t ${DOCKER_USERNAME}/alohomora:${CIRCLE_WORKFLOW_ID} alohomora/ && docker push ${DOCKER_USERNAME}/alohomora:${CIRCLE_WORKFLOW_ID}
 
-  deploy-backend:
+  deploy-alohomora:
     docker:
         - image: circleci/node:10.15
     steps:
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "mcoa_backend_$STAGE" && docker kill mcoa_backend_$STAGE; docker ps -a | grep "mcoa_backend_$STAGE" && docker rm mcoa_backend_$STAGE; docker run --name mcoa_backend_$STAGE --network swag --env-file /var/.envs/.$STAGE.env -d $DOCKER_USERNAME/mcoa_backend:$CIRCLE_WORKFLOW_ID"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "alohomora_$STAGE" && docker kill alohomora_$STAGE; docker ps -a | grep "alohomora_$STAGE" && docker rm alohomora_$STAGE; docker run --name alohomora_$STAGE --network swag --env-file /var/.envs/.$STAGE.env -d $DOCKER_USERNAME/alohomora:$CIRCLE_WORKFLOW_ID"
 
   build-mock-server:
     docker:
@@ -120,21 +120,21 @@ workflows:
           requires:
             - build-frontend
 
-  backend-prod:
+  alohomora-prod:
     jobs: 
-      - test-backend:
+      - test-alohomora:
           context: production
           filters:
             branches: 
               only: /master/
-      - build-backend:
+      - build-alohomora:
           context: production
           requires:
-            - test-backend
-      - deploy-backend:
+            - test-alohomora
+      - deploy-alohomora:
           context: production
           requires:
-            - build-backend
+            - build-alohomora
 
   frontend-staging:
     jobs:
@@ -148,21 +148,21 @@ workflows:
           requires:
             - build-frontend
 
-  backend-staging:
+  alohomora-staging:
     jobs: 
-      - test-backend:
+      - test-alohomora:
           context: staging
           filters:
             branches: 
               only: /staging/
-      - build-backend:
+      - build-alohomora:
           context: staging
           requires:
-            - test-backend
-      - deploy-backend:
+            - test-alohomora
+      - deploy-alohomora:
           context: staging
           requires:
-            - build-backend
+            - build-alohomora
   
   mock-server:
     jobs:

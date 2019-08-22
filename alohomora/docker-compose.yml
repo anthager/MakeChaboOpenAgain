@@ -9,6 +9,6 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mcoa_dev
   mock_server:
-    image: antonhager/mcoa_mock_server:1.0.0
+    image: antonhager/mcoa_mock_server:latest
     ports:
       - '1111:1111'
