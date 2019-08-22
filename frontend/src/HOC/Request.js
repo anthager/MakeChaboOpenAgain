@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { openDoor } from '../utils'
+import { openDoor } from '../helpers/OpenDoor'
 import { PropTypes } from 'prop-types'
 
 export default class RequestHOC extends Component {

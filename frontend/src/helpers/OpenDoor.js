@@ -9,10 +9,8 @@ export async function openDoor() {
   isRunning = true
   while (!complete) {
     // retry on fail
-    const url =
-      process.env.NODE_ENV === 'development'
-        ? 'https://stagingopenapi.anton.pizza/unlock-door'
-        : 'https://openapi.anton.pizza/unlock-door'
+    const url = getBackendEndpoint(window.location.host)
+
     try {
       return await (await fetch(url)).json()
     } catch (err) {
@@ -24,4 +22,13 @@ export async function openDoor() {
       })
     }
   }
+}
+
+export function getBackendEndpoint(host) {
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.BACKEND_ENDPOINT || 'https://staging.api.open.anton.pizza'
+  }
+  return host.match(/staging/i)
+    ? 'https://staging.api.open.anton.pizza'
+    : 'https://api.open.anton.pizza'
 }
