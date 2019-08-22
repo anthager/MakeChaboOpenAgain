@@ -99,6 +99,12 @@ jobs:
       - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - run: docker build -t $DOCKER_USERNAME/mcoa_mock_server:${CIRCLE_WORKFLOW_ID} mock-server/ && docker push $DOCKER_USERNAME/mcoa_mock_server:${CIRCLE_WORKFLOW_ID}
 
+  deploy-mock-server:
+    docker:
+        - image: circleci/node:10.15
+    steps:
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "mcoa_mock_server" && docker kill mcoa_mock_server; docker ps -a | grep "mcoa_mock_server" && docker rm mcoa_mock_server; docker run --name mcoa_mock_server --network swag -e PORT=80 -d $DOCKER_USERNAME/mcoa_mock_server:$CIRCLE_WORKFLOW_ID"
+
 workflows:
   version: 2
 
@@ -157,4 +163,13 @@ workflows:
           context: staging
           requires:
             - build-backend
-      
+  
+  mock-server:
+    jobs:
+      - build-mock-server:
+          filters:
+            branches: 
+              only: /staging/
+      - deploy-mock-server:
+          requires:
+            - build-mock-server

@@ -9,4 +9,5 @@ docker run \
 --name main_server \
 --restart=always \
 --network swag \
+-d \
 antonhager/mcoa_main_server:$TAG

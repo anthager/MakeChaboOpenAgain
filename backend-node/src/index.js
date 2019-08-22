@@ -16,7 +16,6 @@ if (process.env.NODE_ENV !== 'test') {
     await isDatabaseUp()
     app.listen(PORT, () => {
       console.log(`App listening on port ${PORT}`)
-      console.log(`using config:\n`)
     })
   })()
 }

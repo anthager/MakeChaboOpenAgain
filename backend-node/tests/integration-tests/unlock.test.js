@@ -1,6 +1,6 @@
-const knex = require('../db/knex')
+const knex = require('../../db/knex')
 const request = require('supertest')
-const app = require('../src/index')
+const app = require('../../src/index')
 
 describe('request testing', () => {
   beforeAll(async () => {
