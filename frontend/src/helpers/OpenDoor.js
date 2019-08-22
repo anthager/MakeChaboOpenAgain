@@ -9,7 +9,7 @@ export async function openDoor() {
   isRunning = true
   while (!complete) {
     // retry on fail
-    const url = getBackendEndpoint(window.location.host)
+    const url = getAlohomoraEndpoint(window.location.host)
 
     try {
       return await (await fetch(url)).json()
@@ -24,9 +24,9 @@ export async function openDoor() {
   }
 }
 
-export function getBackendEndpoint(host) {
+export function getAlohomoraEndpoint(host) {
   if (process.env.NODE_ENV === 'development') {
-    return process.env.BACKEND_ENDPOINT || 'https://staging.api.open.anton.pizza/unlock'
+    return process.env.ALOHOMORA_ENDPOINT || 'https://staging.api.open.anton.pizza/unlock'
   }
   return host.match(/staging/i)
     ? 'https://staging.api.open.anton.pizza/unlock'
