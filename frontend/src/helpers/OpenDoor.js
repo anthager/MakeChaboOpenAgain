@@ -26,9 +26,9 @@ export async function openDoor() {
 
 export function getBackendEndpoint(host) {
   if (process.env.NODE_ENV === 'development') {
-    return process.env.BACKEND_ENDPOINT || 'https://staging.api.open.anton.pizza'
+    return process.env.BACKEND_ENDPOINT || 'https://staging.api.open.anton.pizza/unlock'
   }
   return host.match(/staging/i)
-    ? 'https://staging.api.open.anton.pizza'
-    : 'https://api.open.anton.pizza'
+    ? 'https://staging.api.open.anton.pizza/unlock'
+    : 'https://api.open.anton.pizza/unlock'
 }
