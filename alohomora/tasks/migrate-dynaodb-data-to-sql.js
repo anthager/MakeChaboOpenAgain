@@ -16,11 +16,11 @@ const fs = require('fs').promises
     success: item.success.S,
     created_at: new Date(+item.timestamp.N),
   }))
-  const res = await Promise.all(
-    items.map(item =>
-      knex('unlocks').insert({ success: item.success, created_at: item.created_at }),
-    ),
-  ).catch(err => console.error(err) || process.exit(1))
+  for (let item of items) {
+    await knex('unlocks')
+      .insert({ success: item.success, created_at: item.created_at })
+      .catch(err => console.error(err) || process.exit(1))
+  }
   knex.destroy()
-  console.log(`${res.length} rows added`)
+  console.log(`${items.length} rows added`)
 })()
