@@ -24,6 +24,7 @@ aliases:
         - frontend/node_modules
       key: frontend-node-dep-{{ .Branch }}-{{ checksum "frontend/yarn.lock"}}
   - &docker-login echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - &remove-old-images ssh -oStrictHostKeyChecking=no "${STAGE}.ci@open.anton.pizza" "bash -s scripts/ci-scripts/remove-old-images.sh"
 
 jobs:
   build-frontend:
@@ -50,8 +51,8 @@ jobs:
       - run: echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
       - run: mv build/build "${STAGE}:$(source scripts/ci-scripts/short-sha.sh)"
       - run: gsutil cp -r "${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "${BUCKET_URL}/${STAGE}"
-      - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "antonhagermalm@open.anton.pizza:/var/www/builds/${STAGE}"
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:$(source scripts/ci-scripts/short-sha.sh) /var/www/${STAGE}"
+      - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "${STAGE}.ci@open.anton.pizza:/var/www/builds/${STAGE}"
+      - run: ssh -oStrictHostKeyChecking=no "${STAGE}.ci@open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:$(source scripts/ci-scripts/short-sha.sh) /var/www/${STAGE}"
 
   test-alohomora:
     docker:
@@ -92,7 +93,8 @@ jobs:
     docker:
       - image: circleci/node:10.15
     steps:
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/deploy-alohomora.sh ${STAGE} alohomora ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)"
+      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/deploy-alohomora.sh ${STAGE} alohomora ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)"
+      - run: *remove-old-images
 
   build-mock-server:
     docker:
@@ -108,7 +110,8 @@ jobs:
     docker:
       - image: circleci/node:10.15
     steps:
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/deploy-alohomora.sh ${STAGE} mcoa_mock_server ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)"
+      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/deploy-alohomora.sh ${STAGE} mcoa_mock_server ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)"
+      - run: *remove-old-images
 
 workflows:
   version: 2
