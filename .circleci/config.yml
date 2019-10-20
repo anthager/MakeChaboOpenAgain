@@ -1,20 +1,40 @@
 version: 2
 
+aliases:
+  - &restore-alohomora-cache
+    restore_cache:
+      keys:
+        - alohomora-node-dep-{{ .Branch }}-{{ checksum "alohomora/yarn.lock"}}
+        - alohomora-node-dep-{{ .Branch }}
+        - alohomora-node-dep-
+  - &save-alohomora-cache
+    save_cache:
+      paths:
+        - alohomora/node_modules
+      key: alohomora-node-dep-{{ .Branch }}-{{ checksum "alohomora/yarn.lock"}}
+  - &restore-frontend-cache
+    restore_cache:
+      keys:
+        - frontend-node-dep-{{ .Branch }}-{{ checksum "frontend/yarn.lock"}}
+        - frontend-node-dep-{{ .Branch }}
+        - frontend-node-dep-
+  - &save-frontend-cache
+    save_cache:
+      paths:
+        - frontend/node_modules
+      key: frontend-node-dep-{{ .Branch }}-{{ checksum "frontend/yarn.lock"}}
+  - &docker-login echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
 jobs:
   build-frontend:
     docker:
-        - image: circleci/node:10.15
+      - image: circleci/node:10.15
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - frontend-dep
+      - *restore-frontend-cache
       - run: yarn --cwd frontend install
-      - save_cache:
-          key: frontend-dep
-          paths:
-            - frontend/node_modules
+      - *save-frontend-cache
       - run: yarn --cwd frontend run build
       - persist_to_workspace:
           root: frontend
@@ -23,87 +43,72 @@ jobs:
 
   deploy-frontend:
     docker:
-        - image: google/cloud-sdk
+      - image: google/cloud-sdk
     steps:
       - attach_workspace:
           at: build
       - run: echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
-      - run: mv build/build "${STAGE}:${CIRCLE_WORKFLOW_ID}"
-      - run: gsutil cp -r "${STAGE}:${CIRCLE_WORKFLOW_ID}" "${BUCKET_URL}/${STAGE}"
-      - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:${CIRCLE_WORKFLOW_ID}" "antonhagermalm@open.anton.pizza:/var/www/builds/${STAGE}"
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:${CIRCLE_WORKFLOW_ID} /var/www/${STAGE}"
+      - run: mv build/build "${STAGE}:$(source scripts/ci-scripts/short-sha.sh)"
+      - run: gsutil cp -r "${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "${BUCKET_URL}/${STAGE}"
+      - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "antonhagermalm@open.anton.pizza:/var/www/builds/${STAGE}"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:$(source scripts/ci-scripts/short-sha.sh) /var/www/${STAGE}"
 
   test-alohomora:
     docker:
-        - image: circleci/node:10.15
-          environment:
-            NODE_ENV: "test"
-        - image: antonhager/mcoa_mock_server
-        - image: postgres:10.5
-          environment:
-            POSTGRES_USER: mcoa_app
-            POSTGRES_PASSWORD: password
-            POSTGRES_DB: mcoa_test
+      - image: circleci/node:10.15
+        environment:
+          NODE_ENV: "test"
+      - image: antonhager/mcoa_mock_server
+      - image: postgres:10.5
+        environment:
+          POSTGRES_USER: mcoa_app
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: mcoa_test
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - alohomora-node-dep
+      - *restore-alohomora-cache
       - run: yarn --cwd alohomora install
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run: yarn --cwd alohomora run test
-      - save_cache:
-          paths:
-            - alohomora/node_modules
-          key: alohomora-dep
+      - *save-alohomora-cache
 
   build-alohomora:
     docker:
-        - image: circleci/node:10.15
-          environment:
-            NODE_ENV: "test"
-        - image: antonhager/mcoa_mock_server
-        - image: postgres:10.5
-          environment:
-            POSTGRES_USER: mcoa_app
-            POSTGRES_PASSWORD: password
-            POSTGRES_DB: mcoa_test
+      - image: circleci/node:10.15
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - alohomora-dep
+      - *restore-alohomora-cache
       - setup_remote_docker
-      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - save_cache:
-          paths:
-            - alohomora/node_modules
-          key: alohomora-dep
-      - run: docker build -t ${DOCKER_USERNAME}/alohomora:${CIRCLE_WORKFLOW_ID} alohomora/ && docker push ${DOCKER_USERNAME}/alohomora:${CIRCLE_WORKFLOW_ID}
+      - run: *docker-login
+      - *save-alohomora-cache
+      - run:
+          command: |
+            docker build -t ${DOCKER_USERNAME}/alohomora:$(source scripts/ci-scripts/short-sha.sh) alohomora
+            docker push ${DOCKER_USERNAME}/alohomora:$(source scripts/ci-scripts/short-sha.sh)
 
   deploy-alohomora:
     docker:
-        - image: circleci/node:10.15
+      - image: circleci/node:10.15
     steps:
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "alohomora_$STAGE" && docker kill alohomora_$STAGE; docker ps -a | grep "alohomora_$STAGE" && docker rm alohomora_$STAGE; docker run --name alohomora_$STAGE --network swag --env-file /var/.envs/.$STAGE.env -d $DOCKER_USERNAME/alohomora:$CIRCLE_WORKFLOW_ID"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/deploy-alohomora.sh ${STAGE} alohomora ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)"
 
   build-mock-server:
     docker:
-        - image: circleci/node:10.15
+      - image: circleci/node:10.15
     working_directory: ~/repo
     steps:
       - checkout
       - setup_remote_docker
       - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - run: docker build -t $DOCKER_USERNAME/mcoa_mock_server:${CIRCLE_WORKFLOW_ID} mock-server/ && docker push $DOCKER_USERNAME/mcoa_mock_server:${CIRCLE_WORKFLOW_ID}
+      - run: docker build -t $DOCKER_USERNAME/mcoa_mock_server:$(source scripts/ci-scripts/short-sha.sh) mock-server/ && docker push $DOCKER_USERNAME/mcoa_mock_server:$(source scripts/ci-scripts/short-sha.sh)
 
   deploy-mock-server:
     docker:
-        - image: circleci/node:10.15
+      - image: circleci/node:10.15
     steps:
-      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@open.anton.pizza" "docker ps | grep "mcoa_mock_server" && docker kill mcoa_mock_server; docker ps -a | grep "mcoa_mock_server" && docker rm mcoa_mock_server; docker run --name mcoa_mock_server --network swag -e PORT=80 -d $DOCKER_USERNAME/mcoa_mock_server:$CIRCLE_WORKFLOW_ID"
+      - run: ssh -oStrictHostKeyChecking=no "antonhagermalm@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/deploy-alohomora.sh ${STAGE} mcoa_mock_server ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)"
 
 workflows:
   version: 2
@@ -113,7 +118,7 @@ workflows:
       - build-frontend:
           context: production
           filters:
-            branches: 
+            branches:
               only: /master/
       - deploy-frontend:
           context: production
@@ -121,11 +126,11 @@ workflows:
             - build-frontend
 
   alohomora-prod:
-    jobs: 
+    jobs:
       - test-alohomora:
           context: production
           filters:
-            branches: 
+            branches:
               only: /master/
       - build-alohomora:
           context: production
@@ -141,7 +146,7 @@ workflows:
       - build-frontend:
           context: staging
           filters:
-            branches: 
+            branches:
               only: /staging/
       - deploy-frontend:
           context: staging
@@ -149,11 +154,11 @@ workflows:
             - build-frontend
 
   alohomora-staging:
-    jobs: 
+    jobs:
       - test-alohomora:
           context: staging
           filters:
-            branches: 
+            branches:
               only: /staging/
       - build-alohomora:
           context: staging
@@ -163,13 +168,15 @@ workflows:
           context: staging
           requires:
             - build-alohomora
-  
+
   mock-server:
     jobs:
       - build-mock-server:
+          context: staging
           filters:
-            branches: 
+            branches:
               only: /staging/
       - deploy-mock-server:
+          context: staging
           requires:
             - build-mock-server
