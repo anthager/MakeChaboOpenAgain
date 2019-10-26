@@ -25,6 +25,7 @@ aliases:
       key: frontend-node-dep-{{ .Branch }}-{{ checksum "frontend/yarn.lock"}}
   - &docker-login echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - &remove-old-images ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/remove-old-images.sh"
+  - &cp-gcloud-key ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "echo $GCLOUD_SERVICE_KEY > cloud_key.json"
 
 jobs:
   build-frontend:
@@ -95,7 +96,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s" < scripts/ci-scripts/deploy-alohomora.sh ${STAGE} alohomora ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)
+      - run: *cp-gcloud-key
+      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s" < scripts/ci-scripts/deploy-alohomora.sh ${STAGE} ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)
       - run: *remove-old-images
 
   build-mock-server:
@@ -105,7 +107,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run: *docker-login
       - run:
           command: |
             docker build -t $DOCKER_USERNAME/mcoa_mock_server:$(source scripts/ci-scripts/short-sha.sh) mock-server/ 
@@ -117,7 +119,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s" < scripts/ci-scripts/deploy-alohomora.sh ${STAGE} mcoa_mock_server ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)
+      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s" < scripts/ci-scripts/deploy-mock-server.sh ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)
       - run: *remove-old-images
 
 workflows:

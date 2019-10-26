@@ -8,10 +8,14 @@ SHA=$3
 if [[ $(docker ps -a | grep "alohomora_${STAGE}") ]]; then
 	docker rm -f alohomora_${STAGE}
 fi
+
+gcloud auth activate-service-account --key-file=~/cloud_key.json
+gsutil cp gs://cool-secrets/${STAGE}.env /var/envs
+
 docker run -d \
 	--name alohomora_${STAGE} \
 	--network swag \
-	--env-file /var/.envs/.$STAGE.env \
+	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
 	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \
 	--label "traefik.http.routers.whoami-http.entrypoints=web" \
