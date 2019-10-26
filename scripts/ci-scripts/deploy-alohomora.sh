@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -ex
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 STAGE=$1
 DOCKER_USERNAME=$2
