@@ -9,7 +9,7 @@ if [[ $(docker ps -a | grep "alohomora_${STAGE}") ]]; then
 	docker rm -f alohomora_${STAGE}
 fi
 
-gcloud auth activate-service-account --key-file=~/cloud_key.json
+gcloud auth activate-service-account --key-file=$HOME/cloud_key.json
 gsutil cp gs://cool-secrets/${STAGE}.env /var/envs
 
 docker run -d \
