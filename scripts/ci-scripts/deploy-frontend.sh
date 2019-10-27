@@ -15,11 +15,11 @@ docker run -d \
 	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
 	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \
-	--label "traefik.http.routers.mcoa_${STAGE}-http.entrypoints=web" \
-	--label "traefik.http.routers.mcoa_${STAGE}-http.rule=Host(\`staging.open.anton.pizza\`)" \
-	--label "traefik.http.routers.mcoa_${STAGE}-http.middlewares=https-redirect" \
-	--label "traefik.http.routers.mcoa_${STAGE}.entrypoints=web-secure" \
-	--label "traefik.http.routers.mcoa_${STAGE}.rule=Host(\`staging.open.anton.pizza\`)" \
-	--label "traefik.http.routers.mcoa_${STAGE}.tls=true" \
-	--label "traefik.http.routers.mcoa_${STAGE}.tls.certresolver=anton-pizza" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}-http.entrypoints=web" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}-http.rule=Host(\`staging.open.anton.pizza\`)" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}-http.middlewares=https-redirect" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}.entrypoints=web-secure" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}.rule=Host(\`staging.open.anton.pizza\`)" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}.tls=true" \
+	--label "traefik.http.routers.mcoa_frontend_${STAGE}.tls.certresolver=anton-pizza" \
 	$DOCKER_USERNAME/mcoa_frontend:$SHA

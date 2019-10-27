@@ -14,7 +14,7 @@ gsutil cp gs://cool-secrets/${STAGE}.env /var/envs
 
 docker run -d \
 	--name alohomora_${STAGE} \
-	--network swag \
+	--network mcoa_${STAGE} \
 	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
 	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \

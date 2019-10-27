@@ -13,6 +13,6 @@ if [[ $(docker ps -a | grep "mcoa_mock_server") ]]; then
 fi
 docker run -d \
 	--name mcoa_mock_server \
-	--network swag \
+	--network mcoa_staging \
 	-e PORT=80 \
 	$DOCKER_USERNAME/mcoa_mock_server:$SHA
