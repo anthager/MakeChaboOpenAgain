@@ -6,8 +6,8 @@ api:
 providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
-    watch: true
     exposedByDefault: false
+    watch: true
 entryPoints:
   web:
     address: ":80"
@@ -19,3 +19,9 @@ certificatesResolvers:
       email: anton.hagermalm@gmail.com
       storage: acme.json
       tlsChallenge: {}
+
+http:
+  middlewares:
+    https-redirect:
+      redirectscheme:
+        scheme: "https"
