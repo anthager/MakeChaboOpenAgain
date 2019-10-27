@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "NODE_ENV=development nodemon src/index.js",
+    "dev": "NODE_ENV=development CONNECTION_STRING=postgres://mcoa_app:password@localhost:5433/mcoa_dev nodemon src/index.js",
     "test": "jest"
   },
   "dependencies": {
