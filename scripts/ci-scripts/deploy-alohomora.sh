@@ -22,7 +22,7 @@ docker run -d \
 	--label "traefik.http.routers.whoami-http.rule=Host(\`staging.open.anton.pizza\`)" \
 	--label "traefik.http.routers.whoami-http.middlewares=https-redirect" \
 	--label "traefik.http.routers.whoami.entrypoints=web-secure" \
-	--label "traefik.http.routers.whoami.rule=Host(\`staging.open.anton.pizza\`)" \
+	--label "traefik.http.routers.whoami.rule=Host(\`api.staging.open.anton.pizza\`)" \
 	--label "traefik.http.routers.whoami.tls=true" \
 	--label "traefik.http.routers.whoami.tls.certresolver=anton-pizza" \
 	$DOCKER_USERNAME/alohomora:$SHA
