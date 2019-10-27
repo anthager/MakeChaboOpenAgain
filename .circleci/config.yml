@@ -34,26 +34,20 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - *restore-frontend-cache
-      - run: yarn --cwd frontend install
-      - *save-frontend-cache
-      - run: yarn --cwd frontend run build
-      - persist_to_workspace:
-          root: frontend
-          paths:
-            - build
+      - setup_remote_docker
+      - run: *docker-login
+      - run:
+          command: |
+            docker build -t ${DOCKER_USERNAME}/mcoa_frontend:$(source scripts/ci-scripts/short-sha.sh) frontend
+            docker push ${DOCKER_USERNAME}/mcoa_frontend:$(source scripts/ci-scripts/short-sha.sh)
 
   deploy-frontend:
     docker:
       - image: google/cloud-sdk
     steps:
-      - attach_workspace:
-          at: build
-      - run: echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
-      - run: mv build/build "${STAGE}:$(source scripts/ci-scripts/short-sha.sh)"
-      - run: gsutil cp -r "${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "${BUCKET_URL}/${STAGE}"
-      - run: scp -r -oStrictHostKeyChecking=no "./${STAGE}:$(source scripts/ci-scripts/short-sha.sh)" "ci@${STAGE}.open.anton.pizza:/var/www/builds/${STAGE}"
-      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "unlink /var/www/${STAGE}; ln -s /var/www/builds/${STAGE}/${STAGE}:$(source scripts/ci-scripts/short-sha.sh) /var/www/${STAGE}"
+      - checkout
+      - run: ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s" < scripts/ci-scripts/deploy-frontend.sh ${STAGE} ${DOCKER_USERNAME} $(source scripts/ci-scripts/short-sha.sh)
+      - run: *remove-old-images
 
   test-alohomora:
     docker:
@@ -81,10 +75,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - *restore-alohomora-cache
       - setup_remote_docker
       - run: *docker-login
-      - *save-alohomora-cache
       - run:
           command: |
             docker build -t ${DOCKER_USERNAME}/alohomora:$(source scripts/ci-scripts/short-sha.sh) alohomora

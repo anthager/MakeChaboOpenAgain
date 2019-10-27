@@ -18,11 +18,8 @@ docker run -d \
 	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
 	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \
-	--label "traefik.http.routers.whoami-http.entrypoints=web" \
-	--label "traefik.http.routers.whoami-http.rule=Host(\`staging.open.anton.pizza\`)" \
-	--label "traefik.http.routers.whoami-http.middlewares=https-redirect" \
-	--label "traefik.http.routers.whoami.entrypoints=web-secure" \
-	--label "traefik.http.routers.whoami.rule=Host(\`api.staging.open.anton.pizza\`)" \
-	--label "traefik.http.routers.whoami.tls=true" \
-	--label "traefik.http.routers.whoami.tls.certresolver=anton-pizza" \
+	--label "traefik.http.routers.alohomora_${STAGE}.entrypoints=web-secure" \
+	--label "traefik.http.routers.alohomora_${STAGE}.rule=Host(\`api.staging.open.anton.pizza\`)" \
+	--label "traefik.http.routers.alohomora_${STAGE}.tls=true" \
+	--label "traefik.http.routers.alohomora_${STAGE}.tls.certresolver=anton-pizza" \
 	$DOCKER_USERNAME/alohomora:$SHA
