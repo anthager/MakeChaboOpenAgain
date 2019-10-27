@@ -18,7 +18,6 @@ docker run -d \
 	--restart always \
 	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
-	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \
 	--label "traefik.http.routers.alohomora_${STAGE}.entrypoints=web-secure" \
 	--label "traefik.http.routers.alohomora_${STAGE}.rule=Host(\`api.staging.open.anton.pizza\`)" \
 	--label "traefik.http.routers.alohomora_${STAGE}.tls=true" \
