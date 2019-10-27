@@ -24,7 +24,7 @@ aliases:
         - frontend/node_modules
       key: frontend-node-dep-{{ .Branch }}-{{ checksum "frontend/yarn.lock"}}
   - &docker-login echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - &remove-old-images ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s scripts/ci-scripts/remove-old-images.sh"
+  - &remove-old-images ssh -oStrictHostKeyChecking=no "ci@${STAGE}.open.anton.pizza" "bash -s" < scripts/ci-scripts/remove-old-images.sh
   - &cp-gcloud-key echo $GCLOUD_SERVICE_KEY > cloud_key.json && scp -oStrictHostKeyChecking=no cloud_key.json "ci@${STAGE}.open.anton.pizza:"
 
 jobs:
