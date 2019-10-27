@@ -12,6 +12,7 @@ fi
 docker run -d \
 	--name mcoa_frontend_${STAGE} \
 	--network mcoa_${STAGE} \
+	--restart always \
 	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
 	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \

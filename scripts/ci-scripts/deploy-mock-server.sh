@@ -14,5 +14,6 @@ fi
 docker run -d \
 	--name mcoa_mock_server \
 	--network mcoa_staging \
+	--restart always \
 	-e PORT=80 \
 	$DOCKER_USERNAME/mcoa_mock_server:$SHA
