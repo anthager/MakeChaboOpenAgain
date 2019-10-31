@@ -12,15 +12,16 @@ fi
 gcloud auth activate-service-account --key-file=$HOME/cloud_key.json
 gsutil cp gs://cool-secrets/${STAGE}.env /var/envs
 
+STAGE_URL=$([ $STAGE = "production" ] && echo "" || echo "${STAGE}.")
+
 docker run -d \
 	--name alohomora_${STAGE} \
 	--network mcoa_${STAGE} \
 	--restart always \
 	--env-file /var/envs/$STAGE.env \
 	--label "traefik.enable=true" \
-	--label "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https" \
 	--label "traefik.http.routers.alohomora_${STAGE}.entrypoints=web-secure" \
-	--label "traefik.http.routers.alohomora_${STAGE}.rule=Host(\`api.staging.open.anton.pizza\`)" \
+	--label "traefik.http.routers.alohomora_${STAGE}.rule=Host(\`api.${STAGE_URL}open.anton.pizza\`) || Host(\`${STAGE_URL}api.open.anton.pizza\`)" \
 	--label "traefik.http.routers.alohomora_${STAGE}.tls=true" \
 	--label "traefik.http.routers.alohomora_${STAGE}.tls.certresolver=anton-pizza" \
 	$DOCKER_USERNAME/alohomora:$SHA

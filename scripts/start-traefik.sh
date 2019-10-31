@@ -11,4 +11,6 @@ docker run -d \
 	-v /var/acme.json:/acme.json \
 	--name traefik \
 	--restart always \
+	--network mcoa_staging \
+	--network mcoa_production \
 	traefik
