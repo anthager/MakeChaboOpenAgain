@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 docker run -d \
 	-p 80:80 \
@@ -12,3 +11,6 @@ docker run -d \
 	--name traefik \
 	--restart always \
 	traefik
+
+docker network connect mcoa_staging traefik
+docker network connect mcoa_production traefik
