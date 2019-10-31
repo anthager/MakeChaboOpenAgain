@@ -19,7 +19,9 @@ certificatesResolvers:
       email: anton.hagermalm@gmail.com
       storage: acme.json
       tlsChallenge: {}
-
+log:
+  format: json
+  level: INFO
 http:
   middlewares:
     https-redirect:
