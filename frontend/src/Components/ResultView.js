@@ -8,7 +8,7 @@ const ResultView = props => {
     return (
       <div className="center">
         <span className="center">door opened, have a nice day :)</span>
-        <a className="mail center" href="mailto:hej@anton.pizza?subject=you good&body=<3">
+        <a className="mail center" href="mailto:anton.hagermalm@gmail.com?subject=you good&body=<3">
           tell me im good
         </a>
       </div>
@@ -25,7 +25,7 @@ const ResultView = props => {
         <span className="center">failed, please dont try again.</span>
         <a
           className="center"
-          href="mailto:hej@anton.pizza?subject=the door open shit is broken man&body=>:("
+          href="mailto:anton.hagermalm@gmail.com?subject=the door open shit is broken man&body=>:("
         >
           tell me its broken
         </a>

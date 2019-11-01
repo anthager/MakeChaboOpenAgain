@@ -1,0 +1,29 @@
+version: "3"
+api:
+  insecure: true
+  dashboard: true
+  debug: true
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    watch: true
+entryPoints:
+  web:
+    address: ":80"
+  web-secure:
+    address: ":443"
+certificatesResolvers:
+  anton-pizza:
+    acme:
+      email: anton.hagermalm@gmail.com
+      storage: acme.json
+      tlsChallenge: {}
+log:
+  format: json
+  level: INFO
+http:
+  middlewares:
+    https-redirect:
+      redirectscheme:
+        scheme: "https"
