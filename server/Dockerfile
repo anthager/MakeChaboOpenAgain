@@ -1,5 +1,0 @@
-FROM nginx:1.15-alpine
-RUN rm -rf /etc/nginx/conf.d
-COPY nginx-conf/nginx.conf /etc/nginx/nginx.conf
-COPY nginx-conf/sites-enabled /etc/nginx/sites-enabled
-CMD ["nginx", "-g", "daemon off;"]

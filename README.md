@@ -22,6 +22,6 @@ The frontend application uses React and can be found in frontend/.
 
 ## Infra
 
-Everything is hosted on a GCE server with nginx and Circle Ci to do all the sweet CI/CD. Since I have beta access to Github actions (😎) more and more of the CI/CD will be handled by actions.
+Everything is hosted on a GCE server with traefik as edge router and Circle Ci to do all the sweet CI/CD.
 
 Pr's welcome
